@@ -18,10 +18,10 @@
 
 ```json
 {
-  "e2e": "playwright test --reporter=line",
-  "e2e:json": "playwright test --reporter=json",
-  "e2e:happy": "playwright test --grep '@happy' --reporter=line",
-  "e2e:edge": "playwright test --grep '@edge' --reporter=line"
+  "e2e": "playwright test",
+  "e2e:json": "playwright test",
+  "e2e:happy": "playwright test --grep '@happy'",
+  "e2e:edge": "playwright test --grep '@edge'"
 }
 ```
 

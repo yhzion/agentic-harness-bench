@@ -2,3 +2,5 @@ reports/*.tmp
 runtime-stats.json
 runtime-pi.log
 runtime-pi-stderr.log
+scope-baseline.json
+scope-violations.jsonl

@@ -91,5 +91,5 @@ test('check-step-scope fails changed files outside the current step allowlist', 
   assert.notEqual(result.status, 0)
   assert.match(result.stderr, /outside current STEP allowlist/)
   assert.match(result.stderr, /README\.md/)
-  assert.doesNotMatch(result.stderr, /src\/index\.ts/)
+  assert.doesNotMatch(result.stderr, /> src\/index\.ts/)
 })

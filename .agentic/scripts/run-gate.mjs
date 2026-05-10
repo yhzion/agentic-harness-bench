@@ -4,7 +4,6 @@ import path from 'node:path'
 import {
   currentStepNumber,
   editableFilesForCurrentStep,
-  expandImplicitAllowedFiles,
   normalizePath,
 } from './step-metadata.mjs'
 
@@ -18,14 +17,22 @@ const stepNumber = currentStepNumber(root)
 
 const COMMANDS = {
   bootstrap: [
-    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['run', 'typecheck'], {
+      script: 'typecheck',
+      introducedAt: 1,
+      applicable: codeFiles,
+    }),
     cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
   ],
   step: [
     cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
     cmd('npm', ['run', 'format:check'], { script: 'format:check', introducedAt: 3 }),
     cmd('npm', ['run', 'lint'], { script: 'lint', introducedAt: 3 }),
-    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['run', 'typecheck'], {
+      script: 'typecheck',
+      introducedAt: 1,
+      applicable: codeFiles,
+    }),
     cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
     cmd('npm', ['run', 'design:lock'], { script: 'design:lock', introducedAt: 3 }),
     cmd('npm', ['run', 'design:check'], { script: 'design:check', introducedAt: 3 }),
@@ -45,7 +52,11 @@ const COMMANDS = {
     cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
     cmd('npm', ['run', 'format:check'], { script: 'format:check', introducedAt: 3 }),
     cmd('npm', ['run', 'lint'], { script: 'lint', introducedAt: 3 }),
-    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['run', 'typecheck'], {
+      script: 'typecheck',
+      introducedAt: 1,
+      applicable: codeFiles,
+    }),
     cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
     cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
     cmd('npm', ['run', 'design:lock'], { script: 'design:lock', introducedAt: 3 }),
@@ -65,7 +76,11 @@ const COMMANDS = {
     cmd('npm', ['run', 'e2e'], { script: 'e2e', introducedAt: 31 }),
   ],
   smoke: [
-    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['run', 'typecheck'], {
+      script: 'typecheck',
+      introducedAt: 1,
+      applicable: codeFiles,
+    }),
   ],
 }
 
@@ -76,7 +91,6 @@ if (!COMMANDS[mode]) {
 
 const missingEditableFiles = editableFilesForCurrentStep(root)
   .filter((file) => !hasGlob(file))
-  .filter((file) => !implicitGeneratedFile(file))
   .filter((file) => !fs.existsSync(path.join(root, normalizePath(file))))
 
 if (missingEditableFiles.length > 0) {
@@ -185,10 +199,6 @@ function ensureDependenciesInstalled() {
 
 function hasGlob(file) {
   return /[*?[\]]/.test(file)
-}
-
-function implicitGeneratedFile(file) {
-  return expandImplicitAllowedFiles([]).includes(file)
 }
 
 function padStep(n) {

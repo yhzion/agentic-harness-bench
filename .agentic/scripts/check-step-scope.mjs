@@ -2,6 +2,7 @@ import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import {
+  currentStepName,
   editableFilesForCurrentStep,
   isPathAllowed,
   normalizePath,
@@ -16,13 +17,20 @@ const changedFiles = gitChangedFiles()
 
 if (args.writeBaseline) {
   const target = path.resolve(root, args.writeBaseline)
-  fs.writeFileSync(target, JSON.stringify({ files: changedFiles, at: new Date().toISOString() }, null, 2))
+  fs.writeFileSync(
+    target,
+    JSON.stringify({ files: changedFiles, at: new Date().toISOString() }, null, 2),
+  )
   console.log(`[scope] baseline written: ${path.relative(root, target)}`)
   process.exit(0)
 }
 
 const allowedFiles = editableFilesForCurrentStep(root)
 if (allowedFiles.length === 0) {
+  if (currentStepName(root) === 'DONE') {
+    console.log('[scope] PASS — no active STEP')
+    process.exit(0)
+  }
   console.error('[scope] FAIL — current STEP has no "수정 가능 파일" allowlist.')
   process.exit(1)
 }

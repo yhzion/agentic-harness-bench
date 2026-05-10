@@ -59,11 +59,16 @@ cat .agentic/progress.json
 git diff
 ```
 
-## 6. 실제 프로젝트에 적용할 때
+## 6. 점수 산출 및 리더보드 갱신
+
+```bash
+MODEL_TAG=my-small-llm npm run agent:benchmark
+```
+
+## 7. 실제 프로젝트에 적용할 때
 
 1. `.agentic/docs/spec.md`를 실제 스펙으로 수정합니다.
 2. `.agentic/contracts/interfaces.md`를 실제 인터페이스로 수정합니다.
 3. `.agentic/contracts/function-signatures.md`를 실제 함수 시그니처로 수정합니다.
 4. `.agentic/steps/*.md`를 실제 STEP으로 나눕니다.
 5. `npm run agent:run:pi`를 실행합니다.
-

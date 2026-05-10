@@ -254,9 +254,22 @@ function metricDiscipline() {
     signatureViolations = (r.stderr.match(/라인 누락/g) || []).length
   }
 
-  const scopeViolations = (progress.failedSteps || []).filter((f) =>
-    /scope|out\s*of\s*allowed/i.test(JSON.stringify(f)),
-  ).length
+  const scopeViolationsFile = path.join(root, '.agentic', 'scope-violations.jsonl')
+  let scopeViolations = 0
+  if (fs.existsSync(scopeViolationsFile)) {
+    scopeViolations = fs
+      .readFileSync(scopeViolationsFile, 'utf8')
+      .split('\n')
+      .filter(Boolean)
+      .reduce((sum, line) => {
+        try {
+          const item = JSON.parse(line)
+          return sum + Math.max(1, item.files?.length || 0)
+        } catch {
+          return sum + 1
+        }
+      }, 0)
+  }
 
   const cap = rubric.axes.discipline.metrics
   return {

@@ -78,6 +78,8 @@ pi --mode json "Your prompt"
     mark-step.mjs
     run-gate.mjs
     check-step-scope.mjs
+    score-run.mjs
+    leaderboard.mjs
     progress-summary.mjs
     write-failure-report.mjs
 
@@ -352,6 +354,14 @@ npm run agent:summary
 npm run agent:scope
 ```
 
+### 점수 산출 및 리더보드 갱신
+
+```bash
+npm run agent:benchmark
+```
+
+이 명령은 `.agentic/benchmarks/<MODEL_TAG>.json`을 생성한 뒤 `LEADERBOARD.md`를 갱신합니다. `MODEL_TAG`를 지정하지 않으면 Pi JSON event에서 감지한 모델명 또는 `unknown-model`을 사용합니다.
+
 ---
 
 ## STEP 파일 작성 규칙
@@ -432,9 +442,13 @@ cp pi-agentic-shell-runner-kit/START_HERE.md ./my-project/START_HERE.md
     "agent:next": "node .agentic/scripts/next-step.mjs",
     "agent:summary": "node .agentic/scripts/progress-summary.mjs",
     "agent:gate:smoke": "node .agentic/scripts/run-gate.mjs smoke",
+    "agent:gate:bootstrap": "node .agentic/scripts/run-gate.mjs bootstrap",
     "agent:gate:step": "node .agentic/scripts/run-gate.mjs step",
     "agent:gate:full": "node .agentic/scripts/run-gate.mjs full",
     "agent:scope": "node .agentic/scripts/check-step-scope.mjs",
+    "agent:score": "node .agentic/scripts/score-run.mjs",
+    "agent:leaderboard": "node .agentic/scripts/leaderboard.mjs",
+    "agent:benchmark": "node .agentic/scripts/score-run.mjs && node .agentic/scripts/leaderboard.mjs",
     "agent:run:pi": "bash .agentic/bin/run-pi-step-loop.sh",
     "agent:run:pi:smoke": "GATE_MODE=smoke bash .agentic/bin/run-pi-step-loop.sh",
     "agent:run:pi:full": "GATE_MODE=full bash .agentic/bin/run-pi-step-loop.sh"
