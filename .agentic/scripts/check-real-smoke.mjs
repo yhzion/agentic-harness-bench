@@ -15,6 +15,19 @@ process.on('SIGINT', cleanup)
 process.on('SIGTERM', cleanup)
 
 try {
+  if (await isPortOpen(HOST, PORT)) {
+    console.error(
+      `[real-smoke] FAIL — port ${PORT} is already in use before preview boot.`,
+    )
+    console.error(
+      `이전 gate 실행의 vite preview가 orphan으로 남아있을 가능성이 큽니다 (PPID=1, --strictPort라 새 preview가 못 뜸).`,
+    )
+    console.error(
+      `해결: \`lsof -i :${PORT} -sTCP:LISTEN -n -P\` 로 점유자 확인 후 kill, 또는 SMOKE_PORT 환경변수로 다른 포트 지정.`,
+    )
+    throw new Error(`port ${PORT} occupied`)
+  }
+
   console.log(`[real-smoke] booting vite preview on ${HOST}:${PORT}...`)
   preview = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
     stdio: ['ignore', 'pipe', 'pipe'],

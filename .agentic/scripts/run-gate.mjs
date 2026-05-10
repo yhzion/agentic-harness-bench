@@ -117,15 +117,16 @@ ensureDependenciesInstalled()
 
 let failed = false
 for (const command of COMMANDS[mode]) {
+  if (stepNumber < command.introducedAt) {
+    console.log(
+      `[skip] ${command.bin} ${command.args.join(' ')} — introduced at STEP ${padStep(
+        command.introducedAt,
+      )}`,
+    )
+    continue
+  }
+
   if (!hasCommand(command)) {
-    if (stepNumber < command.introducedAt) {
-      console.log(
-        `[skip] ${command.bin} ${command.args.join(' ')} — introduced at STEP ${padStep(
-          command.introducedAt,
-        )}`,
-      )
-      continue
-    }
     console.error(
       `[gate] FAILED — required npm script "${command.script}" missing after STEP ${padStep(
         command.introducedAt,
