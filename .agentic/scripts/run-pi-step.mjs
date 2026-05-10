@@ -84,19 +84,12 @@ function render(force = false) {
   lastRenderAt = now
 
   const pct = (((Number(args.stepNum) - 1) / Number(args.total)) * 100).toFixed(1)
-  const totalIn = state.totalIn + stepIn
-  const totalOut = state.totalOut + stepOut
-  const avgTps =
-    state.totalElapsedMs > 0
-      ? (state.totalOut / (state.totalElapsedMs / 1000)).toFixed(1)
-      : '—'
   const model = detectedModel || process.env.PI_MODEL || state.model || 'unknown'
 
   const line =
     `[${pad(args.stepNum, 2)}/${args.total}] ${pct.padStart(4)}% │ ` +
     `${truncate(args.stepName, 32)} │ ${truncate(model, 22)} │ ` +
-    `in ${fmt(totalIn).padStart(7)} │ out ${fmt(totalOut).padStart(7)} │ ` +
-    `${avgTps.padStart(6)} tok/s avg │ try ${args.attempt}/${args.maxRetry}`
+    `try ${args.attempt}/${args.maxRetry}`
 
   if (isTTY) {
     process.stderr.write('\r\x1b[2K' + line)
@@ -129,12 +122,6 @@ function readState() {
   } catch {
     return { ...baseState }
   }
-}
-
-function fmt(n) {
-  if (n >= 1_000_000) return (n / 1_000_000).toFixed(2) + 'M'
-  if (n >= 1_000) return (n / 1_000).toFixed(1) + 'k'
-  return String(n)
 }
 
 function truncate(str, n) {
