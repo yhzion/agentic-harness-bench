@@ -1,0 +1,7 @@
+dist
+node_modules
+.agentic
+README.md
+playwright-report
+test-results
+runs
