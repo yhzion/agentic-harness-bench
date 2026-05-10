@@ -1,16 +1,21 @@
 {
-  "name": "agentic-implementation-kit",
+  "name": "pi-agentic-shell-runner-kit",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A STEP-based implementation kit for small LLM coding agents.",
+  "description": "A Pi-based shell-orchestrated STEP runner kit for small LLM implementation agents.",
   "scripts": {
     "agent:next": "node .agentic/scripts/next-step.mjs",
     "agent:pass": "node .agentic/scripts/mark-step.mjs pass",
     "agent:gate:smoke": "node .agentic/scripts/run-gate.mjs smoke",
     "agent:gate:step": "node .agentic/scripts/run-gate.mjs step",
     "agent:gate:full": "node .agentic/scripts/run-gate.mjs full",
-    "agent:scope": "node .agentic/scripts/check-step-scope.mjs"
+    "agent:scope": "node .agentic/scripts/check-step-scope.mjs",
+    "agent:current": "node .agentic/scripts/current-step-file.mjs",
+    "agent:summary": "node .agentic/scripts/progress-summary.mjs",
+    "agent:run:pi": "bash .agentic/bin/run-pi-step-loop.sh",
+    "agent:run:pi:smoke": "GATE_MODE=smoke bash .agentic/bin/run-pi-step-loop.sh",
+    "agent:run:pi:full": "GATE_MODE=full bash .agentic/bin/run-pi-step-loop.sh"
   },
   "engines": {
     "node": ">=18"
