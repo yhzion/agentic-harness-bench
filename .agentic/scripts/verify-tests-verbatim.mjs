@@ -1,79 +1,60 @@
+import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
+import { canonicalize } from './lock-verbatim-files.mjs'
 
 const root = process.cwd()
-const stepsDir = path.join(root, '.agentic', 'steps')
+const lockFile = path.join(root, '.agentic', 'contracts', 'verbatim-files.lock.json')
 
-const violations = []
-const checked = []
-
-if (!fs.existsSync(stepsDir)) {
-  console.log('[verbatim] no steps dir — skip')
-  process.exit(0)
+if (!fs.existsSync(lockFile)) {
+  console.error(`[verbatim] FAIL — missing lock at ${path.relative(root, lockFile)}`)
+  console.error('         run: node .agentic/scripts/lock-verbatim-files.mjs')
+  process.exit(1)
 }
 
-const VERBATIM_RE = /verbatim\s*(?:복사|append)[^\n]*?→\s*([^\s)]+\.(?:ts|tsx))/g
-const CODE_BLOCK_RE = /```[a-zA-Z0-9]*\n([\s\S]*?)```/
+const lock = JSON.parse(fs.readFileSync(lockFile, 'utf8'))
+const violations = []
+let checked = 0
 
-const stepFiles = fs.readdirSync(stepsDir).filter((f) => /^\d{3}-.*\.md$/.test(f))
+for (const entry of lock.entries) {
+  const targetAbs = path.join(root, entry.target)
+  if (!fs.existsSync(targetAbs)) continue
 
-for (const stepFile of stepFiles) {
-  const stepPath = path.join(stepsDir, stepFile)
-  const content = fs.readFileSync(stepPath, 'utf8')
+  const actual = canonicalize(fs.readFileSync(targetAbs, 'utf8'))
+  const actualSha = crypto.createHash('sha256').update(actual).digest('hex')
+  checked++
 
-  for (const match of content.matchAll(VERBATIM_RE)) {
-    const targetPath = match[1].trim()
-    const afterMatch = content.slice(match.index + match[0].length)
-    const blockMatch = afterMatch.match(CODE_BLOCK_RE)
-    if (!blockMatch) continue
-
-    const expectedCode = blockMatch[1]
-    const targetAbs = path.join(root, targetPath)
-
-    if (!fs.existsSync(targetAbs)) continue
-
-    const actualCode = fs.readFileSync(targetAbs, 'utf8')
-
-    const expectedLines = expectedCode
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0 && !/^\/\//.test(l) && !/^\/\*/.test(l))
-
-    let missing = 0
-    const sample = []
-    for (const line of expectedLines) {
-      if (!actualCode.includes(line)) {
-        missing++
-        if (sample.length < 3) sample.push(line)
-      }
-    }
-
-    checked.push(`${stepFile} ↔ ${targetPath}`)
-
-    if (missing > 0) {
-      violations.push({
-        step: stepFile,
-        target: targetPath,
-        missing_lines: missing,
-        total_expected: expectedLines.length,
-        sample,
-      })
-    }
+  if (actualSha !== entry.composite_sha256) {
+    violations.push({
+      target: entry.target,
+      expected_sha: entry.composite_sha256,
+      actual_sha: actualSha,
+      expected_bytes: entry.composite_bytes,
+      actual_bytes: Buffer.byteLength(actual, 'utf8'),
+      segment_count: entry.segments.length,
+      segments: entry.segments.map((s) => s.step),
+    })
   }
 }
 
 if (violations.length > 0) {
-  console.error('[verbatim] FAIL — verbatim 명세와 실제 파일 불일치:')
+  console.error('[verbatim] FAIL — sha256 mismatch (verbatim 명세를 한 글자도 변경할 수 없다):')
   for (const v of violations) {
-    console.error(
-      `  > ${v.step} ↔ ${v.target}: ${v.missing_lines}/${v.total_expected} 라인 누락`,
-    )
-    for (const s of v.sample) console.error(`      missing: ${s.slice(0, 80)}`)
+    console.error(`  > ${v.target}  (segments: ${v.segments.join(', ')})`)
+    console.error(`      expected sha256: ${v.expected_sha}  (${v.expected_bytes} bytes)`)
+    console.error(`      actual   sha256: ${v.actual_sha}  (${v.actual_bytes} bytes)`)
+    if (v.actual_bytes > v.expected_bytes) {
+      console.error(`      ⚠️  실제 파일이 ${v.actual_bytes - v.expected_bytes} bytes 더 큼 → 추가 코드 의심`)
+    } else if (v.actual_bytes < v.expected_bytes) {
+      console.error(`      ⚠️  실제 파일이 ${v.expected_bytes - v.actual_bytes} bytes 더 작음 → 누락 의심`)
+    } else {
+      console.error(`      ⚠️  bytes 동일하나 내용 다름 → 문자/공백 변형 의심`)
+    }
   }
   console.error('')
-  console.error('verbatim으로 명시된 테스트/시그니처 코드는 LLM이 변경할 수 없다.')
-  console.error('변경이 필요하면 STEP 명세 자체를 갱신하고 lock 파일을 재생성해야 한다.')
+  console.error('변경이 필요하면 STEP 명세 자체를 갱신하고 다음을 실행하라:')
+  console.error('  node .agentic/scripts/lock-verbatim-files.mjs')
   process.exit(1)
 }
 
-console.log(`[verbatim] PASS — ${checked.length}개 verbatim 명세 일치`)
+console.log(`[verbatim] PASS — ${checked}/${lock.entries.length} verbatim files match sha256 lock`)

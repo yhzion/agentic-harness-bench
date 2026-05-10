@@ -1,0 +1,61 @@
+{
+  "$schema_version": "1",
+  "rationale": "e2e 파일은 사용자 시나리오를 검증한다. 검증 환경 자체를 조작하는 Playwright API (네트워크 가로채기, 페이지 컨텍스트 주입, 다이얼로그 자동 처리 등) 를 사용하면 실제 동작이 아닌 패치된 동작을 측정하게 된다. 이 contract 는 '검증 환경 무결성'을 byte-grep 으로 강제한다.",
+  "scope": {
+    "include": ["e2e/**/*.ts", "e2e/**/*.tsx", "e2e/**/*.js", "e2e/**/*.mjs"]
+  },
+  "forbidden_tokens": [
+    {
+      "token": "page.route",
+      "why": "네트워크 응답 가로채기/패치 — 번들 출력을 런타임에 변조 가능"
+    },
+    {
+      "token": "context.route",
+      "why": "BrowserContext 레벨 네트워크 가로채기"
+    },
+    {
+      "token": "route.fulfill",
+      "why": "가로챈 요청에 임의 응답 주입"
+    },
+    {
+      "token": "route.continue",
+      "why": "가로챈 요청 변형 후 통과 — 패치된 응답 가능"
+    },
+    {
+      "token": "route.fallback",
+      "why": "라우트 핸들러 체이닝으로 우회"
+    },
+    {
+      "token": "addInitScript",
+      "why": "페이지 로드 전 임의 스크립트 주입 — 글로벌 객체 조작 가능"
+    },
+    {
+      "token": "page.evaluate",
+      "why": "페이지 컨텍스트에서 임의 JS 실행 — 도메인 상태 직접 조작 가능"
+    },
+    {
+      "token": "page.evaluateHandle",
+      "why": "page.evaluate 변형"
+    },
+    {
+      "token": "page.exposeFunction",
+      "why": "Node 함수를 브라우저 글로벌로 노출 — Web API 누락 보강 가능"
+    },
+    {
+      "token": "page.exposeBinding",
+      "why": "page.exposeFunction 변형"
+    },
+    {
+      "token": "setExtraHTTPHeaders",
+      "why": "요청 헤더 임의 변형"
+    },
+    {
+      "token": "page.setContent",
+      "why": "페이지 HTML 자체 교체 — 빌드 산출물 우회"
+    },
+    {
+      "token": "frame.evaluate",
+      "why": "page.evaluate 와 동일한 위험"
+    }
+  ]
+}

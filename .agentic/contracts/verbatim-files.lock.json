@@ -1,0 +1,398 @@
+{
+  "generated_at": "2026-05-10T13:43:44.514Z",
+  "generator": ".agentic/scripts/lock-verbatim-files.mjs",
+  "canonicalization": "trim trailing whitespace per line; strip leading/trailing blank lines; LF endings; segments joined with single blank line",
+  "semantics": "Final file canonical content MUST equal canonicalize(segments joined with \"\\n\\n\"). No extra code, comments, or imports allowed.",
+  "count": 32,
+  "entries": [
+    {
+      "target": "e2e/_fixtures.ts",
+      "segments": [
+        {
+          "step": "031-e2e-infra.md",
+          "sha256": "965272242b7fb423d0155c6d41f7dcc41a487fdcb4a7a43bb78dfa8082ed7dd7",
+          "bytes": 435
+        }
+      ],
+      "composite_sha256": "965272242b7fb423d0155c6d41f7dcc41a487fdcb4a7a43bb78dfa8082ed7dd7",
+      "composite_bytes": 435
+    },
+    {
+      "target": "e2e/add-validation.spec.ts",
+      "segments": [
+        {
+          "step": "033-e2e-add-validation.md",
+          "sha256": "c458ddf91b1ab352379393a589ec3c3b919ad09a121b2edfb581b6c4a5083b89",
+          "bytes": 3224
+        }
+      ],
+      "composite_sha256": "c458ddf91b1ab352379393a589ec3c3b919ad09a121b2edfb581b6c4a5083b89",
+      "composite_bytes": 3224
+    },
+    {
+      "target": "e2e/add.spec.ts",
+      "segments": [
+        {
+          "step": "032-e2e-add.md",
+          "sha256": "c92fea1b4a4a61dbd1060d22ec4f902bf7014b47b8dbceb3ccf7510b968bdb9d",
+          "bytes": 1796
+        }
+      ],
+      "composite_sha256": "c92fea1b4a4a61dbd1060d22ec4f902bf7014b47b8dbceb3ccf7510b968bdb9d",
+      "composite_bytes": 1796
+    },
+    {
+      "target": "e2e/edit.spec.ts",
+      "segments": [
+        {
+          "step": "035-e2e-edit.md",
+          "sha256": "80e5e7bb2c0ca9d7ffe0cae208d4f6865be0163865e71f2450023eb8e1c88554",
+          "bytes": 2844
+        }
+      ],
+      "composite_sha256": "80e5e7bb2c0ca9d7ffe0cae208d4f6865be0163865e71f2450023eb8e1c88554",
+      "composite_bytes": 2844
+    },
+    {
+      "target": "e2e/filter.spec.ts",
+      "segments": [
+        {
+          "step": "036-e2e-filter.md",
+          "sha256": "78056281adb2969780d5c9d534a675e48f9c5cffcb6e8e13c023e3f6a43bc762",
+          "bytes": 3617
+        }
+      ],
+      "composite_sha256": "78056281adb2969780d5c9d534a675e48f9c5cffcb6e8e13c023e3f6a43bc762",
+      "composite_bytes": 3617
+    },
+    {
+      "target": "e2e/persistence.spec.ts",
+      "segments": [
+        {
+          "step": "037-e2e-persistence.md",
+          "sha256": "822c5511438b3dca551ab37d0d96d3d91d4b232c734f047c9b6f83773b053c8f",
+          "bytes": 3510
+        }
+      ],
+      "composite_sha256": "822c5511438b3dca551ab37d0d96d3d91d4b232c734f047c9b6f83773b053c8f",
+      "composite_bytes": 3510
+    },
+    {
+      "target": "e2e/smoke.spec.ts",
+      "segments": [
+        {
+          "step": "031-e2e-infra.md",
+          "sha256": "e62e8e382344c091ed0aaf276f56dc930ae4085c033054c34f79b40349609bd2",
+          "bytes": 413
+        }
+      ],
+      "composite_sha256": "e62e8e382344c091ed0aaf276f56dc930ae4085c033054c34f79b40349609bd2",
+      "composite_bytes": 413
+    },
+    {
+      "target": "e2e/toggle-remove.spec.ts",
+      "segments": [
+        {
+          "step": "034-e2e-toggle-remove.md",
+          "sha256": "f7680178fbbde818e7caf99b7d66a087fe2caf21197772e885f6f8046d64654a",
+          "bytes": 2728
+        }
+      ],
+      "composite_sha256": "f7680178fbbde818e7caf99b7d66a087fe2caf21197772e885f6f8046d64654a",
+      "composite_bytes": 2728
+    },
+    {
+      "target": "playwright.config.ts",
+      "segments": [
+        {
+          "step": "031-e2e-infra.md",
+          "sha256": "3063e87f6a1393af83c4c6d09556e6e8b61a6069d11f955ac4207075e8040114",
+          "bytes": 608
+        }
+      ],
+      "composite_sha256": "3063e87f6a1393af83c4c6d09556e6e8b61a6069d11f955ac4207075e8040114",
+      "composite_bytes": 608
+    },
+    {
+      "target": "src/App.a11y.test.ts",
+      "segments": [
+        {
+          "step": "029-a11y-final-check.md",
+          "sha256": "84f63d65737ab10456a3d07881ffa8004b41440cd217076ef9f0a447702cc87c",
+          "bytes": 1123
+        }
+      ],
+      "composite_sha256": "84f63d65737ab10456a3d07881ffa8004b41440cd217076ef9f0a447702cc87c",
+      "composite_bytes": 1123
+    },
+    {
+      "target": "src/App.style.test.ts",
+      "segments": [
+        {
+          "step": "028-app-shell-style.md",
+          "sha256": "56c745e0b6e7cf52e46a3e62d882edbc78d1492feed7034f1de32ae68e7485d2",
+          "bytes": 849
+        }
+      ],
+      "composite_sha256": "56c745e0b6e7cf52e46a3e62d882edbc78d1492feed7034f1de32ae68e7485d2",
+      "composite_bytes": 849
+    },
+    {
+      "target": "src/App.test.ts",
+      "segments": [
+        {
+          "step": "027-app-shell-logic.md",
+          "sha256": "f95d5f70eef9c844279c18fce081e5d9d392ff6b6c65f1f1de9838765afdffbf",
+          "bytes": 1905
+        }
+      ],
+      "composite_sha256": "f95d5f70eef9c844279c18fce081e5d9d392ff6b6c65f1f1de9838765afdffbf",
+      "composite_bytes": 1905
+    },
+    {
+      "target": "src/components/TodoFilter.style.test.ts",
+      "segments": [
+        {
+          "step": "026-todo-filter-style.md",
+          "sha256": "ba3c56b90112a55756d2d4fea951e2369c2465190c8ad0bca2fb0e8d2056f2c2",
+          "bytes": 1262
+        }
+      ],
+      "composite_sha256": "ba3c56b90112a55756d2d4fea951e2369c2465190c8ad0bca2fb0e8d2056f2c2",
+      "composite_bytes": 1262
+    },
+    {
+      "target": "src/components/TodoFilter.test.ts",
+      "segments": [
+        {
+          "step": "025-todo-filter-logic.md",
+          "sha256": "232b008e775234e1b3dbeaba75609bf3ef339b13acba940b5f56249a44f8920b",
+          "bytes": 1339
+        }
+      ],
+      "composite_sha256": "232b008e775234e1b3dbeaba75609bf3ef339b13acba940b5f56249a44f8920b",
+      "composite_bytes": 1339
+    },
+    {
+      "target": "src/components/TodoInput.style.test.ts",
+      "segments": [
+        {
+          "step": "020-todo-input-style.md",
+          "sha256": "79f0186080be4916a69aa1c50a7b00ab5f87cfa0958c693f3681baf81f875b13",
+          "bytes": 911
+        }
+      ],
+      "composite_sha256": "79f0186080be4916a69aa1c50a7b00ab5f87cfa0958c693f3681baf81f875b13",
+      "composite_bytes": 911
+    },
+    {
+      "target": "src/components/TodoInput.test.ts",
+      "segments": [
+        {
+          "step": "019-todo-input-logic.md",
+          "sha256": "5c3e988e7d960d1c5f768f264154b5a962b84d69781b4b87806abb89532ded45",
+          "bytes": 1949
+        }
+      ],
+      "composite_sha256": "5c3e988e7d960d1c5f768f264154b5a962b84d69781b4b87806abb89532ded45",
+      "composite_bytes": 1949
+    },
+    {
+      "target": "src/components/TodoItem.style.test.ts",
+      "segments": [
+        {
+          "step": "022-todo-item-style.md",
+          "sha256": "0956443586225a83cc37e5e014ce11cd38abb587e87d2652a014c882a54ea918",
+          "bytes": 1694
+        }
+      ],
+      "composite_sha256": "0956443586225a83cc37e5e014ce11cd38abb587e87d2652a014c882a54ea918",
+      "composite_bytes": 1694
+    },
+    {
+      "target": "src/components/TodoItem.test.ts",
+      "segments": [
+        {
+          "step": "021-todo-item-logic.md",
+          "sha256": "f7266173c3c6dcbc52613ff3e244c31ad44691a764cc07781c56295faeb53c31",
+          "bytes": 2634
+        }
+      ],
+      "composite_sha256": "f7266173c3c6dcbc52613ff3e244c31ad44691a764cc07781c56295faeb53c31",
+      "composite_bytes": 2634
+    },
+    {
+      "target": "src/components/TodoList.style.test.ts",
+      "segments": [
+        {
+          "step": "024-todo-list-style.md",
+          "sha256": "d52920c7007ea3ba1886419935ebfe20508fb34f1a70099b99d917e66a55a860",
+          "bytes": 1311
+        }
+      ],
+      "composite_sha256": "d52920c7007ea3ba1886419935ebfe20508fb34f1a70099b99d917e66a55a860",
+      "composite_bytes": 1311
+    },
+    {
+      "target": "src/components/TodoList.test.ts",
+      "segments": [
+        {
+          "step": "023-todo-list-logic.md",
+          "sha256": "e343b32d6621741ac2b9160e174e2341a92b53e5c05a8ab47497079cc5e0f440",
+          "bytes": 1215
+        }
+      ],
+      "composite_sha256": "e343b32d6621741ac2b9160e174e2341a92b53e5c05a8ab47497079cc5e0f440",
+      "composite_bytes": 1215
+    },
+    {
+      "target": "src/domain/addTodo.test.ts",
+      "segments": [
+        {
+          "step": "010-add-todo.md",
+          "sha256": "29f8b285632af0174367481b8b3bebb8c2410d07dac80095cba7a34c60c4491f",
+          "bytes": 969
+        }
+      ],
+      "composite_sha256": "29f8b285632af0174367481b8b3bebb8c2410d07dac80095cba7a34c60c4491f",
+      "composite_bytes": 969
+    },
+    {
+      "target": "src/domain/createTodo.test.ts",
+      "segments": [
+        {
+          "step": "009-create-todo.md",
+          "sha256": "19d9be8c439f87f6547f53b2ae9fefb425cc0819d5dbc33cda70ec38e3a50aa6",
+          "bytes": 1771
+        }
+      ],
+      "composite_sha256": "19d9be8c439f87f6547f53b2ae9fefb425cc0819d5dbc33cda70ec38e3a50aa6",
+      "composite_bytes": 1771
+    },
+    {
+      "target": "src/domain/filterTodos.test.ts",
+      "segments": [
+        {
+          "step": "014-filter-todos.md",
+          "sha256": "9b3d01a45d697858e2b245efb73bd861cc3e15689ee25380bf03c07f20935208",
+          "bytes": 1186
+        }
+      ],
+      "composite_sha256": "9b3d01a45d697858e2b245efb73bd861cc3e15689ee25380bf03c07f20935208",
+      "composite_bytes": 1186
+    },
+    {
+      "target": "src/domain/removeTodo.test.ts",
+      "segments": [
+        {
+          "step": "013-remove-todo.md",
+          "sha256": "34552ccf845db59a3f82298d6e6e532a8440b7c41236e2b952cbd05c4c538f6a",
+          "bytes": 1066
+        }
+      ],
+      "composite_sha256": "34552ccf845db59a3f82298d6e6e532a8440b7c41236e2b952cbd05c4c538f6a",
+      "composite_bytes": 1066
+    },
+    {
+      "target": "src/domain/toggleTodo.test.ts",
+      "segments": [
+        {
+          "step": "011-toggle-todo.md",
+          "sha256": "2a5822ff910c1018adac8b2f7a8c16b371278b06addaabfd9190504824779c71",
+          "bytes": 1322
+        }
+      ],
+      "composite_sha256": "2a5822ff910c1018adac8b2f7a8c16b371278b06addaabfd9190504824779c71",
+      "composite_bytes": 1322
+    },
+    {
+      "target": "src/domain/updateTodoTitle.test.ts",
+      "segments": [
+        {
+          "step": "012-update-todo-title.md",
+          "sha256": "dc4ed69a766e2db83fec10dc63790a33b3ad9ec3eb20ddf9f77e11d6afdaa12d",
+          "bytes": 1498
+        }
+      ],
+      "composite_sha256": "dc4ed69a766e2db83fec10dc63790a33b3ad9ec3eb20ddf9f77e11d6afdaa12d",
+      "composite_bytes": 1498
+    },
+    {
+      "target": "src/domain/validateTodoTitle.test.ts",
+      "segments": [
+        {
+          "step": "006-validate-title-empty.md",
+          "sha256": "668d1a1334fa20131d04dd3856a29e61f38c7907eb351cb1438441635394b6c7",
+          "bytes": 650
+        },
+        {
+          "step": "008-validate-title-max-length.md",
+          "sha256": "4ca3f609550c47eed83c8aa1d3e36a271899991836fdbbe6ae173365c260eb99",
+          "bytes": 979
+        }
+      ],
+      "composite_sha256": "3faf0a11bedf685c7bef68e77dd79c23880bc4827914ee539bfa2a47a914a205",
+      "composite_bytes": 1631
+    },
+    {
+      "target": "src/hooks/useTodos.test.ts",
+      "segments": [
+        {
+          "step": "018-use-todos-hook.md",
+          "sha256": "ba1fdb1b3aa0dcbd3347384328f2b6a4e021b93b25fbbb405bdb65b51aa35e8e",
+          "bytes": 2800
+        }
+      ],
+      "composite_sha256": "ba1fdb1b3aa0dcbd3347384328f2b6a4e021b93b25fbbb405bdb65b51aa35e8e",
+      "composite_bytes": 2800
+    },
+    {
+      "target": "src/storage/deserializeTodos.test.ts",
+      "segments": [
+        {
+          "step": "016-deserialize-todos.md",
+          "sha256": "3ead432e03c72d8af2b5cc6b07f65315f67d3b435135f1c55fb3b0ab032a820d",
+          "bytes": 1260
+        }
+      ],
+      "composite_sha256": "3ead432e03c72d8af2b5cc6b07f65315f67d3b435135f1c55fb3b0ab032a820d",
+      "composite_bytes": 1260
+    },
+    {
+      "target": "src/storage/serializeTodos.test.ts",
+      "segments": [
+        {
+          "step": "015-serialize-todos.md",
+          "sha256": "d8712d8562607d8aaecbda5a3feb54f4a22b9012d9c5d7e686bde948e0e49f5e",
+          "bytes": 772
+        }
+      ],
+      "composite_sha256": "d8712d8562607d8aaecbda5a3feb54f4a22b9012d9c5d7e686bde948e0e49f5e",
+      "composite_bytes": 772
+    },
+    {
+      "target": "src/storage/todoStorage.test.ts",
+      "segments": [
+        {
+          "step": "017-load-save-todos.md",
+          "sha256": "3ee377bcf6785ff5ad150d713cf4abe1a5494a1894d21be532b9981d76f3c11d",
+          "bytes": 1664
+        }
+      ],
+      "composite_sha256": "3ee377bcf6785ff5ad150d713cf4abe1a5494a1894d21be532b9981d76f3c11d",
+      "composite_bytes": 1664
+    },
+    {
+      "target": "src/types/todo.test.ts",
+      "segments": [
+        {
+          "step": "005-define-todo-types.md",
+          "sha256": "d394f65b48bae990a44cf0b6adec2b2e4faf0272d62cc8cecd175d91a0265824",
+          "bytes": 1074
+        }
+      ],
+      "composite_sha256": "d394f65b48bae990a44cf0b6adec2b2e4faf0272d62cc8cecd175d91a0265824",
+      "composite_bytes": 1074
+    }
+  ]
+}

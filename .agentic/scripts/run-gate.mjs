@@ -26,6 +26,9 @@ const COMMANDS = {
   ],
   step: [
     cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
+    cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
+    cmd('node', ['.agentic/scripts/check-src-imports.mjs'], { introducedAt: 1, applicable: codeFiles }),
+    cmd('node', ['.agentic/scripts/check-e2e-purity.mjs'], { introducedAt: 31 }),
     cmd('npm', ['run', 'format:check'], { script: 'format:check', introducedAt: 3 }),
     cmd('npm', ['run', 'lint'], { script: 'lint', introducedAt: 3 }),
     cmd('npm', ['run', 'typecheck'], {
@@ -44,12 +47,19 @@ const COMMANDS = {
     }),
     cmd('npm', ['run', 'bundle:check'], {
       script: 'bundle:check',
+      introducedAt: 3,
+      applicable: codeFiles,
+    }),
+    cmd('node', ['.agentic/scripts/check-bundle-purity.mjs'], {
       introducedAt: 3,
       applicable: codeFiles,
     }),
   ],
   full: [
     cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
+    cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
+    cmd('node', ['.agentic/scripts/check-src-imports.mjs'], { introducedAt: 1, applicable: codeFiles }),
+    cmd('node', ['.agentic/scripts/check-e2e-purity.mjs'], { introducedAt: 31 }),
     cmd('npm', ['run', 'format:check'], { script: 'format:check', introducedAt: 3 }),
     cmd('npm', ['run', 'lint'], { script: 'lint', introducedAt: 3 }),
     cmd('npm', ['run', 'typecheck'], {
@@ -58,7 +68,6 @@ const COMMANDS = {
       applicable: codeFiles,
     }),
     cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
-    cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
     cmd('npm', ['run', 'design:lock'], { script: 'design:lock', introducedAt: 3 }),
     cmd('npm', ['run', 'design:check'], { script: 'design:check', introducedAt: 3 }),
     cmd('npm', ['run', 'rubric:lock'], { script: 'rubric:lock', introducedAt: 3 }),
@@ -72,7 +81,12 @@ const COMMANDS = {
       introducedAt: 3,
       applicable: codeFiles,
     }),
+    cmd('node', ['.agentic/scripts/check-bundle-purity.mjs'], {
+      introducedAt: 3,
+      applicable: codeFiles,
+    }),
     cmd('npm', ['run', 'preview:check'], { script: 'preview:check', introducedAt: 30 }),
+    cmd('node', ['.agentic/scripts/check-real-smoke.mjs'], { introducedAt: 30, applicable: codeFiles }),
     cmd('npm', ['run', 'e2e'], { script: 'e2e', introducedAt: 31 }),
   ],
   smoke: [

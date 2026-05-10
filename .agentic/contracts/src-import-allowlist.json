@@ -1,0 +1,44 @@
+{
+  "$schema_version": "1",
+  "rationale": "src/ 코드는 브라우저 런타임에서 실행되므로 Node 빌트인 모듈, 비표준 third-party id/random/secret 라이브러리 import를 차단한다. 이 화이트리스트에 없는 모든 npm specifier는 fail. 상대경로(./, ../, /, src/) import 와 'react/jsx-runtime' 같은 sub-path는 허용.",
+  "scope": {
+    "include": ["src/**/*.ts", "src/**/*.tsx"],
+    "exclude": ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.style.test.tsx", "src/**/*.a11y.test.tsx", "src/test/**"]
+  },
+  "allowed_packages": [
+    "react",
+    "react-dom",
+    "react-dom/client",
+    "react/jsx-runtime"
+  ],
+  "forbidden_explicit": [
+    "crypto",
+    "node:crypto",
+    "fs",
+    "node:fs",
+    "fs/promises",
+    "node:fs/promises",
+    "path",
+    "node:path",
+    "os",
+    "node:os",
+    "child_process",
+    "node:child_process",
+    "util",
+    "node:util",
+    "stream",
+    "node:stream",
+    "buffer",
+    "node:buffer",
+    "process",
+    "node:process",
+    "url",
+    "node:url",
+    "uuid",
+    "nanoid",
+    "shortid",
+    "cuid",
+    "ulid"
+  ],
+  "comment_forbidden_explicit": "위 모듈들은 명시적으로 차단. 그 외에도 allowed_packages 에 없는 specifier 는 모두 fail."
+}
