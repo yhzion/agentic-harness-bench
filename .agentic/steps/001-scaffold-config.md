@@ -1,7 +1,7 @@
 # STEP 001. 스캐폴딩 — 패키지 + 도구 설정
 
 ## 작업 단위
-package.json 과 모든 도구 설정 파일(9개)을 생성한다. 진입점(html / src 코드)은 STEP 002의 책임이며 이 STEP에서는 작성하지 않는다.
+package.json 과 모든 도구 설정 파일(10개)을 생성한다. 진입점(index.html / src 컴포넌트 코드)은 STEP 002의 책임이며 이 STEP에서는 작성하지 않는다. 단, `src/vite-env.d.ts`는 Vite의 CSS / CSS Module side-effect import 가 strict TypeScript 환경에서 컴파일되도록 하는 ambient 타입 선언 파일이므로 본 STEP의 스캐폴딩에 포함한다.
 
 ## 기술 스택 (정확한 버전 범위 — 임의 변경 금지)
 
@@ -213,7 +213,15 @@ dist
 .DS_Store
 ```
 
-## 수정 가능 파일 (정확히 9개)
+### src/vite-env.d.ts (신규)
+
+```ts
+/// <reference types="vite/client" />
+```
+
+이 한 줄로 Vite 가 제공하는 ambient module 선언(`*.css`, `*.module.css`, `*.svg` 등)이 활성화되어, 이후 STEP 들에서 `import './foo.css'` 또는 `import styles from './bar.module.css'` 가 별도의 `// @ts-expect-error` 우회 없이 컴파일된다.
+
+## 수정 가능 파일 (정확히 10개)
 - package.json
 - tsconfig.json
 - tsconfig.node.json
@@ -223,12 +231,13 @@ dist
 - .prettierrc.json
 - .prettierignore
 - .gitignore
+- src/vite-env.d.ts
 
 ## 수정 금지
 - `.agentic/contracts/benchmark-rubric.json` (모든 STEP에서 수정 금지)
 - `.agentic/contracts/benchmark-rubric.lock.json`
-- 위 9개 외 모든 파일 (.agentic/** 포함)
-- src/** (STEP 002의 책임)
+- 위 10개 외 모든 파일 (.agentic/** 포함)
+- src/** (STEP 002의 책임) — 단 위 목록의 `src/vite-env.d.ts` 만 예외로 허용
 - index.html (STEP 002의 책임)
 
 ## 검증 명령
@@ -238,9 +247,9 @@ npm install --no-audit --no-fund \
   && node .agentic/scripts/run-gate.mjs step
 ```
 
-이 STEP은 src/ 폴더가 없으므로 run-gate.mjs 가 typecheck/test/build 단계를 자동으로 skip 한다(format:check, lint, design:lock 만 실제 실행). 진입점이 추가된 STEP 002에서 typecheck + build 가 처음으로 실행된다.
+이 STEP은 src/ 가 사실상 비어 있으므로(`src/vite-env.d.ts` ambient 선언 한 줄만 존재) run-gate.mjs 의 typecheck/test/build 단계는 검사 대상이 없거나 trivially 통과한다(format:check, lint, design:lock 만 실제 실행). 진입점이 추가된 STEP 002에서 typecheck + build 가 본격적으로 실행된다.
 
 ## 완료 조건
 - 검증 명령 exit 0
 - node_modules 디렉토리 생성됨
-- src/, index.html 등 STEP 002 산출물 미생성
+- src/ 하위에는 `vite-env.d.ts` 단 하나만 존재 (App.tsx · main.tsx · index.html 등 STEP 002 산출물 미생성)
