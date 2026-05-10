@@ -1,89 +1,122 @@
 import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import {
+  currentStepNumber,
+  editableFilesForCurrentStep,
+  expandImplicitAllowedFiles,
+  normalizePath,
+} from './step-metadata.mjs'
 
+const root = process.cwd()
 const mode = process.argv[2] || 'step'
 const packageJson = fs.existsSync('package.json')
   ? JSON.parse(fs.readFileSync('package.json', 'utf8'))
   : { scripts: {} }
-
 const scripts = packageJson.scripts || {}
+const stepNumber = currentStepNumber(root)
 
-function srcHasFiles(matchExt) {
-  function walk(dir) {
-    if (!fs.existsSync(dir)) return false
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, e.name)
-      if (e.isDirectory()) {
-        if (walk(full)) return true
-      } else if (matchExt.test(e.name)) {
-        return true
-      }
-    }
-    return false
-  }
-  return walk('src')
-}
-
-function isApplicable(command) {
-  if (command[0] !== 'npm') return true
-  const isRun = command[1][0] === 'run'
-  const script = isRun ? command[1][1] : command[1][0]
-
-  if (script === 'typecheck' || script === 'build:strict') {
-    return srcHasFiles(/\.(tsx?|jsx?)$/)
-  }
-  if (script === 'test') {
-    return srcHasFiles(/\.test\.(tsx?|jsx?)$/)
-  }
-  if (script === 'bundle:check') {
-    return srcHasFiles(/\.(tsx?|jsx?)$/)
-  }
-  return true
-}
-
-const STRICT_GATE = [
-  ['npm', ['run', 'format:check']],
-  ['npm', ['run', 'lint']],
-  ['npm', ['run', 'typecheck']],
-  ['npm', ['test']],
-  ['npm', ['run', 'design:lock']],
-  ['npm', ['run', 'design:check']],
-  ['npm', ['run', 'rubric:lock']],
-  ['npm', ['run', 'build:strict']],
-  ['npm', ['run', 'bundle:check']],
-]
-
-const commandsByMode = {
-  smoke: [
-    ['npm', ['run', 'typecheck']],
+const COMMANDS = {
+  bootstrap: [
+    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
   ],
-  step: STRICT_GATE,
+  step: [
+    cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
+    cmd('npm', ['run', 'format:check'], { script: 'format:check', introducedAt: 3 }),
+    cmd('npm', ['run', 'lint'], { script: 'lint', introducedAt: 3 }),
+    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
+    cmd('npm', ['run', 'design:lock'], { script: 'design:lock', introducedAt: 3 }),
+    cmd('npm', ['run', 'design:check'], { script: 'design:check', introducedAt: 3 }),
+    cmd('npm', ['run', 'rubric:lock'], { script: 'rubric:lock', introducedAt: 3 }),
+    cmd('npm', ['run', 'build:strict'], {
+      script: 'build:strict',
+      introducedAt: 3,
+      applicable: codeFiles,
+    }),
+    cmd('npm', ['run', 'bundle:check'], {
+      script: 'bundle:check',
+      introducedAt: 3,
+      applicable: codeFiles,
+    }),
+  ],
+  full: [
+    cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
+    cmd('npm', ['run', 'format:check'], { script: 'format:check', introducedAt: 3 }),
+    cmd('npm', ['run', 'lint'], { script: 'lint', introducedAt: 3 }),
+    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+    cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
+    cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
+    cmd('npm', ['run', 'design:lock'], { script: 'design:lock', introducedAt: 3 }),
+    cmd('npm', ['run', 'design:check'], { script: 'design:check', introducedAt: 3 }),
+    cmd('npm', ['run', 'rubric:lock'], { script: 'rubric:lock', introducedAt: 3 }),
+    cmd('npm', ['run', 'build:strict'], {
+      script: 'build:strict',
+      introducedAt: 3,
+      applicable: codeFiles,
+    }),
+    cmd('npm', ['run', 'bundle:check'], {
+      script: 'bundle:check',
+      introducedAt: 3,
+      applicable: codeFiles,
+    }),
+    cmd('npm', ['run', 'preview:check'], { script: 'preview:check', introducedAt: 30 }),
+    cmd('npm', ['run', 'e2e'], { script: 'e2e', introducedAt: 31 }),
+  ],
+  smoke: [
+    cmd('npm', ['run', 'typecheck'], { script: 'typecheck', introducedAt: 1, applicable: codeFiles }),
+  ],
 }
 
-function hasScript(command) {
-  if (command[0] !== 'npm') return true
-  if (command[1][0] === 'test') return Boolean(scripts.test)
-  if (command[1][0] !== 'run') return true
-  return Boolean(scripts[command[1][1]])
+if (!COMMANDS[mode]) {
+  console.error(`[gate] FAILED — unknown mode "${mode}". Use smoke, bootstrap, step, or full.`)
+  process.exit(2)
 }
 
-const commands = commandsByMode[mode] || commandsByMode.step
+const missingEditableFiles = editableFilesForCurrentStep(root)
+  .filter((file) => !hasGlob(file))
+  .filter((file) => !implicitGeneratedFile(file))
+  .filter((file) => !fs.existsSync(path.join(root, normalizePath(file))))
+
+if (missingEditableFiles.length > 0) {
+  console.error('[gate] FAILED — missing editable files required by current STEP:')
+  for (const file of missingEditableFiles) console.error(`  > ${file}`)
+  process.exit(1)
+}
+
+ensureDependenciesInstalled()
+
 let failed = false
+for (const command of COMMANDS[mode]) {
+  if (!hasCommand(command)) {
+    if (stepNumber < command.introducedAt) {
+      console.log(
+        `[skip] ${command.bin} ${command.args.join(' ')} — introduced at STEP ${padStep(
+          command.introducedAt,
+        )}`,
+      )
+      continue
+    }
+    console.error(
+      `[gate] FAILED — required npm script "${command.script}" missing after STEP ${padStep(
+        command.introducedAt,
+      )}`,
+    )
+    failed = true
+    break
+  }
 
-for (const command of commands) {
-  const [bin, args] = command
-  if (!hasScript(command)) {
-    console.log(`[skip] ${bin} ${args.join(' ')} — script not yet defined in package.json`)
+  if (command.applicable && !command.applicable()) {
+    console.log(`[skip] ${command.bin} ${command.args.join(' ')} — not applicable yet`)
     continue
   }
-  if (!isApplicable(command)) {
-    console.log(`[skip] ${bin} ${args.join(' ')} — src/ 코드 또는 테스트 파일이 아직 없음`)
-    continue
-  }
 
-  console.log(`[run] ${bin} ${args.join(' ')}`)
-  const result = spawnSync(bin, args, { stdio: 'inherit', shell: process.platform === 'win32' })
+  console.log(`[run] ${command.bin} ${command.args.join(' ')}`)
+  const result = spawnSync(command.bin, command.args, {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  })
   if (result.status !== 0) {
     failed = true
     break
@@ -96,3 +129,68 @@ if (failed) {
 }
 
 console.log('[gate] PASSED')
+
+function cmd(bin, args, options = {}) {
+  return { bin, args, introducedAt: 1, ...options }
+}
+
+function hasCommand(command) {
+  if (command.bin !== 'npm') return true
+  if (!command.script) return true
+  return Boolean(scripts[command.script])
+}
+
+function srcHasFiles(matchExt) {
+  function walk(dir) {
+    if (!fs.existsSync(dir)) return false
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        if (walk(full)) return true
+      } else if (matchExt.test(entry.name)) {
+        return true
+      }
+    }
+    return false
+  }
+  return walk('src')
+}
+
+function codeFiles() {
+  return srcHasFiles(/\.(tsx?|jsx?)$/)
+}
+
+function testFiles() {
+  return srcHasFiles(/\.test\.(tsx?|jsx?)$/)
+}
+
+function ensureDependenciesInstalled() {
+  if (process.env.AGENTIC_SKIP_NPM_INSTALL === '1') return
+  if (fs.existsSync(path.join(root, 'node_modules'))) return
+  const dependencyCount =
+    Object.keys(packageJson.dependencies || {}).length +
+    Object.keys(packageJson.devDependencies || {}).length
+  if (dependencyCount === 0) return
+
+  console.log('[gate] node_modules missing — running npm install --no-audit --no-fund')
+  const result = spawnSync('npm', ['install', '--no-audit', '--no-fund'], {
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+  })
+  if (result.status !== 0) {
+    console.error('[gate] FAILED — npm install failed')
+    process.exit(result.status ?? 1)
+  }
+}
+
+function hasGlob(file) {
+  return /[*?[\]]/.test(file)
+}
+
+function implicitGeneratedFile(file) {
+  return expandImplicitAllowedFiles([]).includes(file)
+}
+
+function padStep(n) {
+  return String(n).padStart(3, '0')
+}

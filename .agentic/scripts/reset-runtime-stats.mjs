@@ -3,6 +3,8 @@ import path from 'node:path'
 
 const stateFile = path.join('.agentic', 'runtime-stats.json')
 const progressFile = path.join('.agentic', 'progress.json')
+const scopeBaselineFile = path.join('.agentic', 'scope-baseline.json')
+const scopeViolationsFile = path.join('.agentic', 'scope-violations.jsonl')
 
 const fresh = {
   totalIn: 0,
@@ -29,6 +31,9 @@ const progressEmpty = (() => {
 
 if (force || progressEmpty || !fs.existsSync(stateFile)) {
   fs.writeFileSync(stateFile, JSON.stringify(fresh, null, 2))
+  for (const file of [scopeBaselineFile, scopeViolationsFile]) {
+    if (fs.existsSync(file)) fs.rmSync(file)
+  }
   console.log(`[runtime-stats] reset → ${stateFile}`)
 } else {
   console.log(`[runtime-stats] kept (in-progress run detected; use --force to reset)`)

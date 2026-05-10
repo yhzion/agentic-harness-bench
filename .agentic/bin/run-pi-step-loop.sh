@@ -7,6 +7,7 @@ PI_BIN="${PI_BIN:-pi}"
 PI_MODE="${PI_MODE:-json}"
 AUTO_COMMIT="${AUTO_COMMIT:-0}"
 PROMPT_TEMPLATE=".agentic/prompts/pi-step-implementer.md"
+SCOPE_BASELINE=".agentic/scope-baseline.json"
 
 if [ ! -d ".agentic" ]; then
   echo "[agentic] .agentic directory not found. Run this from the project root."
@@ -118,6 +119,8 @@ while true; do
   echo "═════════════════════════════════════════════════════════════"
   echo "  STEP $STEP_NUM/$TOTAL_STEPS ($PCT%) → $STEP_BASENAME"
   echo "═════════════════════════════════════════════════════════════"
+
+  node .agentic/scripts/check-step-scope.mjs --write-baseline "$SCOPE_BASELINE"
 
   attempt=1
   while [ "$attempt" -le "$MAX_RETRY" ]; do
