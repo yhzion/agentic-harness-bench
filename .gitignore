@@ -6,4 +6,17 @@ coverage/
 .env.*
 !.env.example
 .DS_Store
+
+# Harness runtime artifacts
 .agentic/reports/*.tmp
+.agentic/runtime-pi.log
+.agentic/runtime-stats.json
+.agentic/scope-baseline.json
+.agentic/scope-violations.jsonl
+
+# Bench output (created by model implementations during runs)
+playwright-report/
+test-results/
+
+# Per-model worktree root — each model's run lives under runs/<model>/
+runs/
