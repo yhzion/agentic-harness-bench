@@ -26,6 +26,9 @@
 - **e2e 의 환경**: Playwright + chromium. *test framework* 는 page.route 등 우회 도구를 *제공*하지만, 사용은 e2e-purity gate 가 차단.
 - **check-real-smoke 의 환경**: raw chromium. 어떤 우회 도구도 사용하지 않음. 실제 사용자 환경.
 
+전체 환경 사실: `.agentic/docs/runtime-environment.md`
+검증 환경 무결성 절대 원칙: `.agentic/docs/test-environment-integrity.md`
+
 ## 자주 만나는 환경 funnel
 
 ```txt

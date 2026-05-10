@@ -29,3 +29,12 @@ Your role is only to implement the current STEP.
 6. Stop after implementation.
 
 The shell runner will execute tests, typecheck, lint, build, retry, and step advancement.
+
+## Mandatory reading (read once at session start)
+
+These canonical docs define the *environment* and *integrity* contracts that every STEP implicitly assumes. They contain no implementation answers — only constraints and self-test procedures.
+
+- `.agentic/docs/runtime-environment.md` — where src/ runs, available globals, forbidden Node modules, env funnel (vitest vs vite vs raw chromium)
+- `.agentic/docs/test-environment-integrity.md` — absolute rules for tests/e2e: no patching the verification environment; verbatim contracts are byte-immutable; forbidden Playwright APIs
+
+If a STEP would force you to violate either doc, stop and report — do not work around the violation.

@@ -14,6 +14,27 @@ export function getCurrentTimestamp(): number
 export function createTodo(title: string): Todo
 ```
 
+### 동작 요구 (테스트가 검증하는 행동 — 코드 아님)
+
+- `generateTodoId()`: 50회 연속 호출 시 50개 모두 다른 값 반환 (uniqueness 강).
+- `getCurrentTimestamp()`: 호출 직전 `Date.now()` 와 직후 `Date.now()` 사이의 ms 단위 정수.
+- `createTodo(title)`: title 을 trim, 빈 문자열은 throw, createdAt = updatedAt 동일 시각.
+
+### 환경 (반드시 준수 — 위반 시 src-imports gate fail)
+
+- 이 코드는 브라우저 ESM 환경에서 실행됨. 자세한 환경 사실: `.agentic/docs/runtime-environment.md`.
+- 단위 테스트는 vitest+jsdom 통과해도 *런타임 보장 아님*. `check-real-smoke` 가 ground truth.
+
+### 금지 (제약 — 답을 leak 하지 않는 반례 목록)
+
+- ❌ `import { randomUUID } from 'crypto'` (Node 빌트인. vite externalize → TypeError)
+- ❌ `import { randomUUID } from 'node:crypto'` (동일)
+- ❌ `import { v4 } from 'uuid'`, `nanoid`, `cuid`, `ulid` (allowlist 차단)
+- ❌ `Math.random()` 단독 (50회 unique 보장 불가)
+- ❌ `String(Date.now())` 기반 단독 id (동시 호출 충돌)
+
+→ 위 제약 안에서 `## 동작 요구` 를 만족하는 *브라우저 표준* API 를 선택할 것. 환경 글로벌 목록은 `runtime-environment.md` 참조.
+
 ## 사전 작성된 테스트 (verbatim 복사 → src/domain/createTodo.test.ts)
 
 ```ts
@@ -75,9 +96,9 @@ describe('createTodo', () => {
 ```
 
 ## 작업 지시
-1. createTodo.ts에 세 함수를 시그니처대로 구현한다.
-2. createTodo는 내부에서 validateTodoTitle을 호출하고, 실패 시 throw new Error(message)를 던진다.
-3. id 생성은 crypto.randomUUID() 사용을 권장(별도 라이브러리 추가 금지).
+1. createTodo.ts 에 세 함수를 시그니처대로 구현한다.
+2. createTodo 는 내부에서 validateTodoTitle 을 호출하고, 실패 시 `throw new Error(message)` 를 던진다.
+3. id 생성: 위 `## 환경` + `## 금지` 안에서 `## 동작 요구` 를 만족하는 *브라우저 표준* API 를 선택. 의심되면 `runtime-environment.md` 의 "사용 가능 글로벌" 표 참조.
 
 ## 수정 가능 파일 (정확히 2개)
 - src/domain/createTodo.ts

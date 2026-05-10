@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T13:43:44.514Z",
+  "generated_at": "2026-05-10T14:08:43.329Z",
   "generator": ".agentic/scripts/lock-verbatim-files.mjs",
   "canonicalization": "trim trailing whitespace per line; strip leading/trailing blank lines; LF endings; segments joined with single blank line",
   "semantics": "Final file canonical content MUST equal canonicalize(segments joined with \"\\n\\n\"). No extra code, comments, or imports allowed.",
