@@ -40,12 +40,10 @@ export type UseTodosResult = {
   todos: Todo[]
   filter: TodoFilter
   visibleTodos: Todo[]
-  error: string | null
   addTodoAction(title: string): void
   toggleTodoAction(id: string): void
   updateTodoTitleAction(id: string, title: string): void
   removeTodoAction(id: string): void
   setFilterAction(filter: TodoFilter): void
-  clearErrorAction(): void
 }
 ```

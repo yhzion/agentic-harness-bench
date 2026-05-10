@@ -1,0 +1,8 @@
+{
+  "comment": "BMW Todo 앱 번들 예산 (gzipped). React 19 baseline ~45KB 기준 약 3배 여유.",
+  "maxTotalGzipped": 153600,
+  "maxFileGzipped": {
+    "js": 102400,
+    "css": 10240
+  }
+}

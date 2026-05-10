@@ -1,0 +1,145 @@
+{
+  "version": "1.0.0",
+  "locked_at": "2026-05-10",
+  "policy": {
+    "no_self_evaluation": true,
+    "no_external_llm_judge": true,
+    "deterministic_sources_only": true,
+    "model_must_not_modify_rubric": true,
+    "model_must_not_modify_tests_verbatim": true,
+    "score_run_must_not_call_llm_api": true
+  },
+  "score_aggregation": "weighted_sum_normalized_to_100",
+  "repeats_recommended": 3,
+  "axes": {
+    "correctness": {
+      "weight": 0.35,
+      "description": "통과한 STEP 비율 — 결정적 게이트 통과 여부만 사용",
+      "metrics": {
+        "step_pass_rate": {
+          "weight": 1.0,
+          "source": ".agentic/progress.json",
+          "field": "completedSteps.length",
+          "max": 37,
+          "lower_is_better": false
+        }
+      }
+    },
+    "robustness": {
+      "weight": 0.25,
+      "description": "e2e 시나리오 통과율 — Playwright JSON reporter 출력만 사용",
+      "metrics": {
+        "e2e_happy_pass": {
+          "weight": 0.4,
+          "source": "playwright-report/results.json",
+          "suite_filter": "happy",
+          "max_scenarios": 4,
+          "lower_is_better": false
+        },
+        "e2e_edge_pass": {
+          "weight": 0.6,
+          "source": "playwright-report/results.json",
+          "suite_filter": "edge",
+          "max_scenarios": 12,
+          "lower_is_better": false
+        }
+      }
+    },
+    "quality": {
+      "weight": 0.20,
+      "description": "정성적 코드 품질을 결정적 위반 카운트로 환원",
+      "metrics": {
+        "eslint_violations": {
+          "weight": 0.3,
+          "source": "npx eslint . --format json",
+          "extract": "sum(messages.length)",
+          "cap": 50,
+          "lower_is_better": true
+        },
+        "tsc_errors": {
+          "weight": 0.3,
+          "source": "npx tsc --noEmit --pretty false",
+          "extract": "regex_count(/error TS/)",
+          "cap": 30,
+          "lower_is_better": true
+        },
+        "design_token_violations": {
+          "weight": 0.2,
+          "source": ".agentic/scripts/check-design-tokens.mjs",
+          "extract": "stderr_lines_starting_with('  > ')",
+          "cap": 20,
+          "lower_is_better": true
+        },
+        "a11y_violations": {
+          "weight": 0.2,
+          "source": "vitest run src/App.a11y.test.tsx --reporter=json",
+          "extract": "axe.violations.length sum",
+          "cap": 10,
+          "lower_is_better": true
+        }
+      }
+    },
+    "efficiency": {
+      "weight": 0.10,
+      "description": "재시도/시간 — runtime-stats.json 만 사용",
+      "metrics": {
+        "first_pass_rate": {
+          "weight": 0.5,
+          "source": ".agentic/runtime-stats.json",
+          "extract": "first_pass_count / total_completed",
+          "lower_is_better": false
+        },
+        "avg_retries": {
+          "weight": 0.3,
+          "source": ".agentic/runtime-stats.json",
+          "extract": "total_attempts / total_completed - 1",
+          "cap": 3,
+          "lower_is_better": true
+        },
+        "wall_time_seconds": {
+          "weight": 0.2,
+          "source": ".agentic/runtime-stats.json",
+          "extract": "total_duration_seconds",
+          "cap": 7200,
+          "lower_is_better": true
+        }
+      }
+    },
+    "discipline": {
+      "weight": 0.10,
+      "description": "스펙 준수 — 허용 외 파일 변경, 시그니처 drift",
+      "metrics": {
+        "scope_violations": {
+          "weight": 0.5,
+          "source": ".agentic/scripts/score-run.mjs (scope-audit subroutine)",
+          "extract": "files_modified_outside_step_allowlist count",
+          "cap": 20,
+          "lower_is_better": true
+        },
+        "signature_violations": {
+          "weight": 0.5,
+          "source": ".agentic/scripts/verify-tests-verbatim.mjs",
+          "extract": "tests_diverged_from_spec count",
+          "cap": 10,
+          "lower_is_better": true
+        }
+      }
+    }
+  },
+  "tamper_detection": {
+    "fingerprint_targets": [
+      ".agentic/progress.json",
+      ".agentic/runtime-stats.json"
+    ],
+    "fingerprint_output": ".agentic/.run-fingerprint.json",
+    "verify_on_score": true
+  },
+  "guards": {
+    "abort_score_if_env_var_present": [
+      "ANTHROPIC_API_KEY",
+      "OPENAI_API_KEY",
+      "GOOGLE_API_KEY"
+    ],
+    "abort_score_reason": "score-run.mjs는 결정적 도구만 사용해야 하며 LLM API 호출 가능성을 차단한다."
+  }
+}

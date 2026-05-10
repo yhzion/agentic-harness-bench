@@ -29,8 +29,27 @@ if [ ! -f "$PROMPT_TEMPLATE" ]; then
   exit 1
 fi
 
+TOTAL_STEPS="$(find .agentic/steps -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')"
+
+node .agentic/scripts/reset-runtime-stats.mjs
+
+step_number_of() {
+  local target_basename="$1"
+  local n=0
+  for f in $(ls .agentic/steps/*.md | sort); do
+    n=$((n + 1))
+    if [ "$(basename "$f" .md)" = "$target_basename" ]; then
+      echo "$n"
+      return 0
+    fi
+  done
+  echo "0"
+}
+
 run_pi_for_step() {
   local step_file="$1"
+  local step_num="$2"
+  local attempt="$3"
   local prompt_file
   prompt_file="$(mktemp)"
 
@@ -44,11 +63,21 @@ run_pi_for_step() {
     cat "$step_file"
   } > "$prompt_file"
 
-  echo "[agentic] invoking Pi: $PI_BIN --mode $PI_MODE <prompt>"
-  "$PI_BIN" --mode "$PI_MODE" "$(cat "$prompt_file")"
-  local status="$?"
+  local step_name
+  step_name="$(basename "$step_file" .md)"
+
+  node .agentic/scripts/run-pi-step.mjs \
+    --step-num "$step_num" \
+    --total "$TOTAL_STEPS" \
+    --step-name "$step_name" \
+    --attempt "$attempt" \
+    --max-retry "$MAX_RETRY" \
+    --prompt-file "$prompt_file" \
+    --pi-bin "$PI_BIN" \
+    --pi-mode "$PI_MODE"
+  local status=$?
   rm -f "$prompt_file"
-  return "$status"
+  return $status
 }
 
 commit_step_if_enabled() {
@@ -68,48 +97,52 @@ commit_step_if_enabled() {
   fi
 
   git add -A
-  git commit -m "Complete $step_file"
+  git commit -m "Complete $(basename "$step_file" .md)"
 }
 
 while true; do
   STEP_FILE="$(node .agentic/scripts/current-step-file.mjs)"
 
   if [ "$STEP_FILE" = "DONE" ]; then
-    echo "[agentic] all steps completed."
+    echo ""
+    echo "[agentic] all $TOTAL_STEPS steps completed."
     node .agentic/scripts/progress-summary.mjs
     exit 0
   fi
 
-  echo "[agentic] current step: $STEP_FILE"
+  STEP_BASENAME="$(basename "$STEP_FILE" .md)"
+  STEP_NUM="$(step_number_of "$STEP_BASENAME")"
+  PCT="$(awk -v n="$STEP_NUM" -v t="$TOTAL_STEPS" 'BEGIN{printf "%.1f", (n-1)/t*100}')"
+
+  echo ""
+  echo "═════════════════════════════════════════════════════════════"
+  echo "  STEP $STEP_NUM/$TOTAL_STEPS ($PCT%) → $STEP_BASENAME"
+  echo "═════════════════════════════════════════════════════════════"
+
   attempt=1
-
   while [ "$attempt" -le "$MAX_RETRY" ]; do
-    echo "[agentic] attempt $attempt/$MAX_RETRY"
-
-    if ! run_pi_for_step "$STEP_FILE"; then
-      echo "[agentic] Pi command failed for $STEP_FILE"
-      node .agentic/scripts/mark-step.mjs fail "Pi command failed for $STEP_FILE"
+    if ! run_pi_for_step "$STEP_FILE" "$STEP_NUM" "$attempt"; then
+      echo "[agentic] Pi failed for $STEP_BASENAME (attempt $attempt/$MAX_RETRY)"
+      node .agentic/scripts/mark-step.mjs fail "Pi failed on attempt $attempt"
     else
-      echo "[agentic] running gate: npm run agent:gate:$GATE_MODE"
-      if npm run "agent:gate:$GATE_MODE"; then
-        echo "[agentic] gate passed for $STEP_FILE"
-        npm run agent:scope || true
+      echo "[agentic] running gate: $GATE_MODE"
+      if npm run "agent:gate:$GATE_MODE" --silent; then
+        echo "[agentic] ✓ gate passed for $STEP_BASENAME"
         node .agentic/scripts/mark-step.mjs pass
         commit_step_if_enabled "$STEP_FILE"
         break
       fi
-
-      echo "[agentic] gate failed for $STEP_FILE"
-      node .agentic/scripts/mark-step.mjs fail "Gate failed for $STEP_FILE on attempt $attempt"
+      echo "[agentic] ✗ gate failed for $STEP_BASENAME (attempt $attempt/$MAX_RETRY)"
+      node .agentic/scripts/mark-step.mjs fail "Gate failed on attempt $attempt"
     fi
 
     if [ "$attempt" -ge "$MAX_RETRY" ]; then
-      echo "[agentic] max retries reached for $STEP_FILE"
+      echo "[agentic] max retries reached for $STEP_BASENAME"
       node .agentic/scripts/write-failure-report.mjs "$STEP_FILE" "Max retries reached."
       exit 1
     fi
 
     attempt=$((attempt + 1))
-    echo "[agentic] retrying same step..."
+    echo "[agentic] retrying $STEP_BASENAME ($attempt/$MAX_RETRY)..."
   done
 done

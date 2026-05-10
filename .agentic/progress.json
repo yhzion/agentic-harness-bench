@@ -1,8 +1,8 @@
 {
-  "currentStep": "001-project-health",
+  "currentStep": "001-scaffold-config",
   "completedSteps": [],
   "failedSteps": [],
   "retryCount": 0,
   "lastResult": "READY",
-  "nextStep": "001-project-health"
+  "nextStep": "001-scaffold-config"
 }
