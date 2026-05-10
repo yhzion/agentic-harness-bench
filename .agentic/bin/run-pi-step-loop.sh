@@ -34,6 +34,7 @@ fi
 
 TOTAL_STEPS="$(find .agentic/steps -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')"
 
+node .agentic/scripts/init-progress.mjs
 node .agentic/scripts/reset-runtime-stats.mjs
 
 step_number_of() {
