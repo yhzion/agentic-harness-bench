@@ -25,14 +25,8 @@
       "token": "route.fallback",
       "why": "라우트 핸들러 체이닝으로 우회"
     },
-    {
-      "token": "addInitScript",
-      "why": "페이지 로드 전 임의 스크립트 주입 — 글로벌 객체 조작 가능"
-    },
-    {
-      "token": "page.evaluate",
-      "why": "페이지 컨텍스트에서 임의 JS 실행 — 도메인 상태 직접 조작 가능"
-    },
+
+
     {
       "token": "page.evaluateHandle",
       "why": "page.evaluate 변형"

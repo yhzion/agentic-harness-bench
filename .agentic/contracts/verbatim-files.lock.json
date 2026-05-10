@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-10T14:17:30.343Z",
+  "generated_at": "2026-05-10T17:12:47.374Z",
   "generator": ".agentic/scripts/lock-verbatim-files.mjs",
   "canonicalization": "trim trailing whitespace per line; strip leading/trailing blank lines; LF endings; segments joined with single blank line",
   "semantics": "Final file canonical content MUST equal canonicalize(segments joined with \"\\n\\n\"). No extra code, comments, or imports allowed.",
@@ -10,24 +10,24 @@
       "segments": [
         {
           "step": "031-e2e-infra.md",
-          "sha256": "965272242b7fb423d0155c6d41f7dcc41a487fdcb4a7a43bb78dfa8082ed7dd7",
-          "bytes": 435
+          "sha256": "1f5b04f1d358292e2a8037731cf0c145870c141ad1869195a59e8b2bc4a3c8b7",
+          "bytes": 100
         }
       ],
-      "composite_sha256": "965272242b7fb423d0155c6d41f7dcc41a487fdcb4a7a43bb78dfa8082ed7dd7",
-      "composite_bytes": 435
+      "composite_sha256": "1f5b04f1d358292e2a8037731cf0c145870c141ad1869195a59e8b2bc4a3c8b7",
+      "composite_bytes": 100
     },
     {
       "target": "e2e/add-validation.spec.ts",
       "segments": [
         {
           "step": "033-e2e-add-validation.md",
-          "sha256": "c458ddf91b1ab352379393a589ec3c3b919ad09a121b2edfb581b6c4a5083b89",
-          "bytes": 3224
+          "sha256": "fb50f12189fa02660cb002713871f233162c6a20ffb6648b6da18b91e00934fc",
+          "bytes": 3087
         }
       ],
-      "composite_sha256": "c458ddf91b1ab352379393a589ec3c3b919ad09a121b2edfb581b6c4a5083b89",
-      "composite_bytes": 3224
+      "composite_sha256": "fb50f12189fa02660cb002713871f233162c6a20ffb6648b6da18b91e00934fc",
+      "composite_bytes": 3087
     },
     {
       "target": "e2e/add.spec.ts",
@@ -46,12 +46,12 @@
       "segments": [
         {
           "step": "035-e2e-edit.md",
-          "sha256": "80e5e7bb2c0ca9d7ffe0cae208d4f6865be0163865e71f2450023eb8e1c88554",
-          "bytes": 2844
+          "sha256": "729e6e2598bcb51cd69cf34e64677bc201ccf5e382b176c2740e9c78e90d4ac8",
+          "bytes": 2838
         }
       ],
-      "composite_sha256": "80e5e7bb2c0ca9d7ffe0cae208d4f6865be0163865e71f2450023eb8e1c88554",
-      "composite_bytes": 2844
+      "composite_sha256": "729e6e2598bcb51cd69cf34e64677bc201ccf5e382b176c2740e9c78e90d4ac8",
+      "composite_bytes": 2838
     },
     {
       "target": "e2e/filter.spec.ts",

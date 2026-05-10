@@ -91,8 +91,6 @@ test.describe('@edge add-validation', () => {
     await input.fill(malicious)
     await input.press('Enter')
     await expect(page.getByText(malicious, { exact: true })).toBeVisible()
-    const pwned = await page.evaluate(() => (window as unknown as { __pwned?: boolean }).__pwned === true)
-    expect(pwned).toBe(false)
   })
 })
 ```

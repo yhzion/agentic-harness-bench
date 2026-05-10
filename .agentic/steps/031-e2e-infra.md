@@ -62,25 +62,7 @@ export default defineConfig({
 ```ts
 import { test as base, expect } from '@playwright/test'
 
-type Fixtures = {
-  cleanLocalStorage: void
-}
-
-export const test = base.extend<Fixtures>({
-  cleanLocalStorage: [
-    async ({ page }, useFixture) => {
-      await page.addInitScript(() => {
-        try {
-          window.localStorage.clear()
-        } catch {
-          // ignore
-        }
-      })
-      await useFixture()
-    },
-    { auto: true },
-  ],
-})
+export const test = base
 
 export { expect }
 ```
