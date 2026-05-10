@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
 
 const root = process.cwd()
 const contractFile = path.join(root, '.agentic', 'contracts', 'src-import-allowlist.json')
@@ -51,6 +52,7 @@ if (violations.length > 0) {
   console.error(`  allowed:    ${[...allowed].join(', ')}`)
   console.error(`  + 상대경로 import (./, ../)`)
   console.error('계약 변경이 필요하면 .agentic/contracts/src-import-allowlist.json 을 갱신.')
+  emitRecoveryHint({ gate: 'src-imports', violations })
   process.exit(1)
 }
 

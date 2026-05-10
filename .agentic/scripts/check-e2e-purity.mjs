@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
 
 const root = process.cwd()
 const contractFile = path.join(root, '.agentic', 'contracts', 'e2e-forbidden-apis.json')
@@ -46,6 +47,7 @@ if (violations.length > 0) {
   console.error('')
   console.error('e2e 는 실제 사용자처럼 페이지를 조작해야 한다. 우회 API 사용 시 STEP fail.')
   console.error('계약 변경이 필요하면 .agentic/contracts/e2e-forbidden-apis.json 갱신.')
+  emitRecoveryHint({ gate: 'e2e-purity', violations })
   process.exit(1)
 }
 

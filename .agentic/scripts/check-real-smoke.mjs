@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process'
 import net from 'node:net'
+import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
 
 const PORT = Number(process.env.SMOKE_PORT || 4174)
 const HOST = '127.0.0.1'
@@ -110,6 +111,11 @@ function fail(message, consoleErrors) {
   console.error('')
   console.error('이 검증은 raw 브라우저로 add 시나리오를 실행한다. 어떤 patch/polyfill 도 사용하지 않는다.')
   console.error('실제 사용자 환경에서 실패한다는 뜻이다.')
+  emitRecoveryHint({
+    gate: 'real-smoke',
+    violations: consoleErrors.map((e) => ({ label: e.type, detail: e.message })),
+    extra: message,
+  })
   const e = new Error(message)
   e.alreadyReported = true
   return e

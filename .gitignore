@@ -9,6 +9,7 @@ coverage/
 
 # Harness runtime artifacts
 .agentic/reports/*.tmp
+.agentic/reports/recovery-hint.md
 .agentic/runtime-pi.log
 .agentic/runtime-stats.json
 .agentic/scope-baseline.json

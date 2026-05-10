@@ -2,6 +2,7 @@ import crypto from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import { canonicalize } from './lock-verbatim-files.mjs'
+import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
 
 const root = process.cwd()
 const lockFile = path.join(root, '.agentic', 'contracts', 'verbatim-files.lock.json')
@@ -54,6 +55,7 @@ if (violations.length > 0) {
   console.error('')
   console.error('변경이 필요하면 STEP 명세 자체를 갱신하고 다음을 실행하라:')
   console.error('  node .agentic/scripts/lock-verbatim-files.mjs')
+  emitRecoveryHint({ gate: 'verbatim', violations })
   process.exit(1)
 }
 

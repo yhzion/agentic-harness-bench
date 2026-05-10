@@ -1,0 +1,156 @@
+{
+  "$schema_version": "1",
+  "rationale": "각 gate 의 deterministic 실패에 대해 모델이 다음 retry 에서 자가치유할 수 있도록 진단·자가검증 절차·금지 행동을 매핑. 답(코드)은 절대 포함하지 않는다. 모델은 자가검증 절차를 따라 *발견*해야 한다.",
+  "patterns": [
+    {
+      "id": "verbatim-mismatch",
+      "detect": { "gate": "verbatim" },
+      "diagnosis": [
+        "spec 의 verbatim 코드블록은 *계약*. byte-level sha256 비교.",
+        "추가/제거/공백/주석/import 어느 것 하나라도 다르면 fail.",
+        "특히 e2e/test 파일의 polyfill/helper 추가는 검증 환경 무결성 위반."
+      ],
+      "self_test_procedure": [
+        "1. cat .agentic/contracts/verbatim-files.lock.json | jq '.entries[] | select(.target==\"<위반된 파일 경로>\")' 으로 lock 정보 확인",
+        "2. 해당 step .md 의 ```...``` 블록과 실제 파일을 줄 단위 diff",
+        "3. 차이가 helper/polyfill/import 추가라면: 추가한 코드를 *제거*하고, 원래 의도한 문제를 src/ 에서 해결",
+        "4. 차이가 prettier reformatting 이라면: spec 의 코드블록이 이미 정규화 형태이므로 그대로 복원"
+      ],
+      "investigation_questions": [
+        "왜 이 helper/추가 코드가 필요했는가? (보통 src/ 의 버그를 우회하려는 시도)",
+        "그 버그를 src/ 본체에서 직접 고치면 helper 가 불필요해지지 않는가?"
+      ],
+      "do_not": [
+        "verbatim 파일에 임의 helper 함수 추가 금지",
+        "verbatim 파일에 polyfill/patch 코드 추가 금지",
+        "verbatim 파일을 prettier --write 로 reformat 시도 금지"
+      ]
+    },
+    {
+      "id": "node-import-in-browser",
+      "detect": { "gate": "src-imports" },
+      "diagnosis": [
+        "src/ 코드는 브라우저 ESM 환경에서 실행됨.",
+        "이 import 한 모듈은 Node.js 빌트인 또는 미허용 third-party 패키지.",
+        "vite 가 빈 객체로 externalize → 호출 시 TypeError: undefined.method.",
+        "vitest+jsdom 에서는 *통과*함 (Node 환경) → 그래서 단위 테스트로 못 잡음."
+      ],
+      "self_test_procedure": [
+        "1. 'npm run build' 실행 → stderr 에 'Module \"X\" has been externalized' 메시지가 있는지 확인",
+        "2. dist/assets/*.js 에서 't.exports={}' 또는 'exports={}' 패턴을 grep — 있으면 dead Node shim 의 흔적",
+        "3. 'npm run preview' 후 raw 브라우저에서 페이지 열어 콘솔 에러 확인",
+        "4. 또는 'node .agentic/scripts/check-real-smoke.mjs' 직접 실행"
+      ],
+      "investigation_questions": [
+        "이 모듈이 제공하는 *기능*은 정확히 무엇인가? (예: 강한 randomness)",
+        "동일 기능을 브라우저 환경에서 어디서 제공하는가? (globalThis.* / Web*)",
+        "그 브라우저 API 는 secure context 요구사항이 있는가? (요구한다면 어떤 환경에서 안전한가)",
+        "그 API 의 함수 시그니처는 import 한 Node 모듈과 어떻게 다른가?"
+      ],
+      "do_not": [
+        "절대 e2e 또는 test 파일에 polyfill 함수/page.route 패치를 추가하지 말 것 (다른 gate 가 잡음 + 검증 무결성 위반)",
+        "import 만 제거하고 함수 호출은 그대로 두지 말 것 (런타임 ReferenceError)",
+        "third-party uuid/nanoid/cuid 같은 패키지 추가 금지 (allowlist 차단)",
+        "globalThis 가 아닌 임의 글로벌 변수 의존 금지 (window 는 SSR 환경에서 깨짐)"
+      ]
+    },
+    {
+      "id": "e2e-environment-mutation",
+      "detect": { "gate": "e2e-purity" },
+      "diagnosis": [
+        "e2e 가 자기 검증 환경을 조작하는 Playwright API 를 사용했음.",
+        "page.route / route.fulfill / addInitScript / page.evaluate 등은 번들 출력이나 런타임 글로벌을 변형 가능.",
+        "이런 도구로 e2e 를 통과시켜도, 실제 사용자 환경(=raw browser)에서는 같은 우회가 없음 → 점수 부풀리기."
+      ],
+      "self_test_procedure": [
+        "1. 위반된 e2e 파일의 해당 라인을 *제거*",
+        "2. 'npm run e2e' 재실행 — 시나리오가 그래도 통과해야 함",
+        "3. 통과 못 하면: src/ 본체에 *진짜 버그*가 있다는 신호. src/ 에서 수정"
+      ],
+      "investigation_questions": [
+        "이 patch/intercept 가 가리고 있는 src/ 의 실제 동작 결함은 무엇인가?",
+        "그 결함을 src/ 에서 직접 고치면 e2e 우회가 불필요해지지 않는가?",
+        "spec 이 verbatim 으로 명시한 e2e 코드와 비교했을 때 추가된 부분은 정확히 무엇인가?"
+      ],
+      "do_not": [
+        "page.route, route.fulfill, addInitScript, page.evaluate, page.exposeFunction, setExtraHTTPHeaders 등 환경 조작 API 사용 절대 금지",
+        "e2e 의 spec verbatim 블록 외에 임의 helper 함수 추가 금지",
+        "test fixture (_fixtures.ts) 에서 글로벌 patch 시도 금지"
+      ]
+    },
+    {
+      "id": "bundle-has-dead-node-shims",
+      "detect": { "gate": "bundle-purity" },
+      "diagnosis": [
+        "vite build 가 src/ 의 import 를 브라우저용으로 처리하지 못해 빈 CommonJS shim 을 번들에 넣었음.",
+        "런타임에 그 shim 의 메서드를 호출하면 undefined.method TypeError.",
+        "src-imports gate 가 먼저 잡았어야 하는데 빠져나간 경우, 또는 transitive dependency 에서 발생."
+      ],
+      "self_test_procedure": [
+        "1. vite build 의 stderr 전체에서 'externalized for browser compatibility' 라인 모두 추출 → 어떤 모듈이 외부화되었는지 목록화",
+        "2. 그 모듈을 import 한 src/ 파일 grep",
+        "3. 직접 import 가 아니라면 transitive dependency 추적 (npm ls <module>)"
+      ],
+      "investigation_questions": [
+        "어느 src/ 파일이 이 모듈을 import 하는가?",
+        "transitive 라면 어느 dependency 가 가져오는가? 그 dependency 가 정말 필요한가?"
+      ],
+      "do_not": [
+        "vite.config.ts 에 임의 polyfill/alias 설정 추가 금지 (대증요법)",
+        "rollup external 설정으로 경고 숨기기 금지",
+        "dist 산출물 직접 수정 금지"
+      ]
+    },
+    {
+      "id": "real-browser-runtime-failure",
+      "detect": { "gate": "real-smoke" },
+      "diagnosis": [
+        "raw chromium 으로 add 시나리오 실행 시 실패.",
+        "어떤 patch/polyfill/route 우회도 사용하지 않은 환경.",
+        "실제 사용자 환경에서 앱이 깨진다는 결정적 증거.",
+        "e2e gate 가 통과했더라도 e2e 가 우회를 사용했다는 뜻 (e2e-purity gate 가 잡지 못한 새 패턴 가능)."
+      ],
+      "self_test_procedure": [
+        "1. 'npm run preview' 띄우고 브라우저 (chrome) 직접 열기",
+        "2. F12 → Console 탭 보면서 add 동작 시도",
+        "3. 첫 번째로 뜨는 에러 메시지를 정확히 기록 (stack trace 포함)",
+        "4. 그 에러를 trigger 하는 src/ 코드 라인 식별",
+        "5. 'node .agentic/scripts/check-real-smoke.mjs' 직접 실행하면 동일 에러 + trace 보여줌"
+      ],
+      "investigation_questions": [
+        "에러 메시지의 핵심 토큰 (예: TypeError, ReferenceError, undefined.X) 은 무엇을 가리키는가?",
+        "단위 테스트는 통과했는데 브라우저에서 실패하는 이유는? (테스트 환경 ≠ 런타임 환경)",
+        "그 차이를 만든 의존성 (Node 모듈, jsdom polyfill 등) 은 무엇인가?"
+      ],
+      "do_not": [
+        "test 환경에 추가 polyfill/setup 으로 *증상만* 가리기 금지 (gate 는 raw chromium)",
+        "check-real-smoke.mjs 를 수정해 시나리오 약화 시도 금지 (.agentic/scripts 는 모든 STEP 에서 수정 금지)",
+        "preview 의 호스트/포트를 바꿔 우회 시도 금지"
+      ]
+    },
+    {
+      "id": "scope-violation",
+      "detect": { "gate": "step-scope" },
+      "diagnosis": [
+        "현재 STEP 의 '수정 가능 파일' 화이트리스트 외 파일을 변경했음.",
+        "이는 이 step 이 책임지지 않는 영역. 다른 step 의 산출물 또는 kit 본체."
+      ],
+      "self_test_procedure": [
+        "1. 'git status --porcelain' 으로 변경 파일 목록 확인",
+        "2. .agentic/steps/<현재 STEP>.md 의 '수정 가능 파일' 섹션과 대조",
+        "3. baseline (.agentic/scope-baseline.json) 에 없는 파일 중 허용 외인 것 식별",
+        "4. 그 파일 변경을 *되돌리고*, 필요 동작은 허용된 파일 내에서 달성"
+      ],
+      "investigation_questions": [
+        "왜 이 파일을 건드려야 했는가? (보통 의존 관계 누락 또는 prerequisite 미충족)",
+        "그 의존이 *진짜로* 다른 파일 수정을 요구하는가, 아니면 허용 파일 안에서 해결 가능한가?",
+        "스펙이 prerequisite 를 빠뜨렸다고 의심되면, 우회하지 말고 STEP 을 fail 시키고 사용자에게 보고"
+      ],
+      "do_not": [
+        "'잠깐만 임시로' 다른 파일 수정 금지 (다음 step 에서 일관성 깨짐)",
+        "이전 step 의 산출물 reformatting 금지",
+        ".agentic/** 모든 파일 수정 금지 (kit 본체)"
+      ]
+    }
+  ]
+}

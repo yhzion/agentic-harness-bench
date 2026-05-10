@@ -8,6 +8,8 @@ PI_MODE="${PI_MODE:-json}"
 AUTO_COMMIT="${AUTO_COMMIT:-0}"
 PROMPT_TEMPLATE=".agentic/prompts/pi-step-implementer.md"
 SCOPE_BASELINE=".agentic/scope-baseline.json"
+RECOVERY_HINT=".agentic/reports/recovery-hint.md"
+RECOVERY_PLAYBOOK=".agentic/contracts/recovery-playbook.md"
 
 if [ ! -d ".agentic" ]; then
   echo "[agentic] .agentic directory not found. Run this from the project root."
@@ -62,6 +64,15 @@ run_pi_for_step() {
     echo ""
     echo "# Current STEP content"
     cat "$step_file"
+    if [ "$attempt" -gt 1 ] && [ -f "$RECOVERY_HINT" ]; then
+      echo ""
+      echo "# ⚠️ Previous attempt failed — Recovery Hint"
+      echo ""
+      echo "직전 시도가 gate 에서 실패했다. 아래 hint 와 \`$RECOVERY_PLAYBOOK\` 의 매크로 원칙을"
+      echo "*반드시* 읽고 self_test_procedure 를 직접 실행한 뒤 수정하라. 같은 우회 시도는 다시 fail."
+      echo ""
+      cat "$RECOVERY_HINT"
+    fi
   } > "$prompt_file"
 
   local step_name
@@ -121,6 +132,7 @@ while true; do
   echo "═════════════════════════════════════════════════════════════"
 
   node .agentic/scripts/check-step-scope.mjs --write-baseline "$SCOPE_BASELINE"
+  rm -f "$RECOVERY_HINT"
 
   attempt=1
   while [ "$attempt" -le "$MAX_RETRY" ]; do

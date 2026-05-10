@@ -7,6 +7,7 @@ import {
   isPathAllowed,
   normalizePath,
 } from './step-metadata.mjs'
+import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
 
 const root = process.cwd()
 const args = parseArgs(process.argv.slice(2))
@@ -55,6 +56,11 @@ if (outside.length > 0) {
   console.error('')
   console.error('Allowed files:')
   for (const file of allowedFiles) console.error(`  - ${file}`)
+  emitRecoveryHint({
+    gate: 'step-scope',
+    violations: outside.map((f) => ({ file: f, reason: 'outside-allowlist' })),
+    extra: { allowed: allowedFiles, currentStep: safeCurrentStep() },
+  })
   process.exit(1)
 }
 

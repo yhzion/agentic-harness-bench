@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { spawnSync } from 'node:child_process'
+import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
 
 const root = process.cwd()
 const distDir = path.join(root, 'dist')
@@ -77,6 +78,7 @@ if (violations.length > 0) {
   }
   console.error('')
   console.error('src/ 의 import 문 중 Node 전용 모듈을 찾아 브라우저 글로벌/Web API 로 대체하라.')
+  emitRecoveryHint({ gate: 'bundle-purity', violations })
   process.exit(1)
 }
 
