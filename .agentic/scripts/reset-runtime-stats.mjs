@@ -11,6 +11,10 @@ const fresh = {
   completedSteps: 0,
   model: null,
   startedAt: new Date().toISOString(),
+  stepHistory: [],
+  firstPassCount: 0,
+  totalCompletedSteps: 0,
+  totalAttempts: 0,
 }
 
 const force = process.argv.includes('--force')

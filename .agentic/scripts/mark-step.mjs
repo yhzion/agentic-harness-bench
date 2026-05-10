@@ -12,6 +12,7 @@ if (!['pass', 'fail'].includes(result)) {
 const root = process.cwd()
 const agenticDir = path.join(root, '.agentic')
 const progressPath = path.join(agenticDir, 'progress.json')
+const runtimeStatsPath = path.join(agenticDir, 'runtime-stats.json')
 const stepsDir = path.join(agenticDir, 'steps')
 
 const progress = JSON.parse(fs.readFileSync(progressPath, 'utf8'))
@@ -25,6 +26,8 @@ if (currentIndex === -1) {
   process.exit(1)
 }
 
+const previousRetryCount = Number(progress.retryCount || 0)
+
 if (result === 'pass') {
   if (!progress.completedSteps.includes(currentStep)) {
     progress.completedSteps.push(currentStep)
@@ -35,12 +38,43 @@ if (result === 'pass') {
   progress.currentStep = nextFile ? nextFile.replace(/\.md$/, '') : 'DONE'
   progress.nextStep = progress.currentStep
 } else {
-  progress.retryCount = Number(progress.retryCount || 0) + 1
+  progress.retryCount = previousRetryCount + 1
   progress.lastResult = 'FAIL'
   progress.failedSteps.push({ step: currentStep, message, at: new Date().toISOString() })
 }
 
 fs.writeFileSync(progressPath, JSON.stringify(progress, null, 2) + '\n')
+
+function readRuntimeStats() {
+  try {
+    return JSON.parse(fs.readFileSync(runtimeStatsPath, 'utf8'))
+  } catch {
+    return {}
+  }
+}
+
+const stats = readRuntimeStats()
+if (!Array.isArray(stats.stepHistory)) stats.stepHistory = []
+if (typeof stats.firstPassCount !== 'number') stats.firstPassCount = 0
+if (typeof stats.totalCompletedSteps !== 'number') stats.totalCompletedSteps = 0
+if (typeof stats.totalAttempts !== 'number') stats.totalAttempts = 0
+
+if (result === 'pass') {
+  const attempts = previousRetryCount + 1
+  stats.stepHistory.push({
+    step: currentStep,
+    attempts,
+    result: 'pass',
+    completedAt: new Date().toISOString(),
+  })
+  stats.totalCompletedSteps += 1
+  stats.totalAttempts += 1
+  if (attempts === 1) stats.firstPassCount += 1
+} else {
+  stats.totalAttempts += 1
+}
+
+fs.writeFileSync(runtimeStatsPath, JSON.stringify(stats, null, 2) + '\n')
 
 const progressMd = [
   '# Progress',

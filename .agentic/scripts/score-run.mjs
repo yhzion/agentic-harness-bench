@@ -204,21 +204,37 @@ function metricQuality() {
 }
 
 function metricEfficiency() {
-  const completed = (progress.completedSteps || []).length || 1
-  const failed = (progress.failedSteps || []).length
-  const totalAttempts = completed + failed
-  const firstPassRate = clamp01(completed / Math.max(totalAttempts, 1))
-  const avgRetries = clamp01((totalAttempts - completed) / completed)
+  const totalCompleted =
+    typeof runtimeStats.totalCompletedSteps === 'number' && runtimeStats.totalCompletedSteps > 0
+      ? runtimeStats.totalCompletedSteps
+      : (progress.completedSteps || []).length
+
+  const totalAttempts =
+    typeof runtimeStats.totalAttempts === 'number' && runtimeStats.totalAttempts > 0
+      ? runtimeStats.totalAttempts
+      : totalCompleted + (progress.failedSteps || []).length
+
+  const firstPassCount =
+    typeof runtimeStats.firstPassCount === 'number'
+      ? runtimeStats.firstPassCount
+      : Math.max(0, totalCompleted - (progress.failedSteps || []).length)
+
+  const firstPassRate = totalCompleted > 0 ? firstPassCount / totalCompleted : 0
+  const avgRetries = totalCompleted > 0 ? (totalAttempts - totalCompleted) / totalCompleted : 0
   const wallSec = (runtimeStats.totalElapsedMs || 0) / 1000
 
   const cap = rubric.axes.efficiency.metrics
   return {
     first_pass_rate: {
       raw: firstPassRate,
+      first_pass_count: firstPassCount,
+      total_completed: totalCompleted,
       normalized: clamp01(firstPassRate),
     },
     avg_retries: {
       raw: avgRetries,
+      total_attempts: totalAttempts,
+      total_completed: totalCompleted,
       cap: cap.avg_retries.cap,
       normalized: normalize(avgRetries, null, true, cap.avg_retries.cap),
     },
