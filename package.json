@@ -1,0 +1,18 @@
+{
+  "name": "agentic-implementation-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A STEP-based implementation kit for small LLM coding agents.",
+  "scripts": {
+    "agent:next": "node .agentic/scripts/next-step.mjs",
+    "agent:pass": "node .agentic/scripts/mark-step.mjs pass",
+    "agent:gate:smoke": "node .agentic/scripts/run-gate.mjs smoke",
+    "agent:gate:step": "node .agentic/scripts/run-gate.mjs step",
+    "agent:gate:full": "node .agentic/scripts/run-gate.mjs full",
+    "agent:scope": "node .agentic/scripts/check-step-scope.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

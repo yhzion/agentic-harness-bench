@@ -1,0 +1,8 @@
+{
+  "currentStep": "001-project-health",
+  "completedSteps": [],
+  "failedSteps": [],
+  "retryCount": 0,
+  "lastResult": "READY",
+  "nextStep": "001-project-health"
+}
