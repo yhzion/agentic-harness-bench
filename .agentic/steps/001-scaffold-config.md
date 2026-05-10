@@ -29,11 +29,11 @@ prettier                     ^3.0.0
 
 ```json
 {
-  "name": "pi-agentic-shell-runner-kit",
+  "name": "agentic-harness-bench",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A Pi-based shell-orchestrated STEP runner kit for small LLM implementation agents.",
+  "description": "Benchmark harness for measuring autonomous coding completion of lightweight LLM agents under fixed STEP-based contracts.",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

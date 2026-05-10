@@ -1,6 +1,9 @@
-# Pi Agentic Shell Runner Kit
+# Agentic Harness Bench
 
-이 저장소는 **Pi Coding Agent + 소형 LLM**으로 STEP 기반 자율 구현을 수행하기 위한 템플릿입니다.
+이 저장소는 **경량 LLM × 에이전틱 코딩 하네스**의 강도를 측정하는 벤치마크입니다.
+같은 STEP-기반 계약 + 결정론적 게이트 위에서 *어느 수준의 하네스가 있어야 모델이 자율적으로 끝까지 구현 가능한가* 를 모델별·크기별로 비교합니다.
+
+현재 reference agent 는 **Pi Coding Agent** 이며, 추후 다양한 에이전트/언어로 확장 가능하도록 설계되었습니다.
 
 핵심 설계는 다음과 같습니다.
 
@@ -157,8 +160,8 @@ export ANTHROPIC_API_KEY="..."
 ### 1. 압축 해제
 
 ```bash
-unzip pi-agentic-shell-runner-kit.zip
-cd pi-agentic-shell-runner-kit
+unzip agentic-harness-bench.zip
+cd agentic-harness-bench
 ```
 
 ### 2. 현재 STEP 확인
@@ -429,8 +432,8 @@ npm test -- validateTodoTitle
 이미 존재하는 프로젝트에 적용하려면 `.agentic` 디렉토리와 필요한 스크립트만 복사합니다.
 
 ```bash
-cp -R pi-agentic-shell-runner-kit/.agentic ./my-project/.agentic
-cp pi-agentic-shell-runner-kit/START_HERE.md ./my-project/START_HERE.md
+cp -R agentic-harness-bench/.agentic ./my-project/.agentic
+cp agentic-harness-bench/START_HERE.md ./my-project/START_HERE.md
 ```
 
 `package.json`에는 다음 스크립트를 추가합니다.
