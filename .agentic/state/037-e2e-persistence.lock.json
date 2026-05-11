@@ -1,0 +1,7 @@
+{
+  "step": "037-e2e-persistence",
+  "completedAt": "2026-05-11T06:47:56.508Z",
+  "files": {
+    "e2e/persistence.spec.ts": "sha256:10823e17a0af5deafcb37f83cd63211fd605326ba173cccfb8b473289910b983"
+  }
+}

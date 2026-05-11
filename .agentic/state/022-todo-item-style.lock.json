@@ -1,0 +1,9 @@
+{
+  "step": "022-todo-item-style",
+  "completedAt": "2026-05-11T06:45:09.657Z",
+  "files": {
+    "src/components/TodoItem.module.css": "sha256:3b0fef619d137c61341c5c363d12af0dc134d111bc1d893bc87711b619d423e0",
+    "src/components/TodoItem.style.test.tsx": "sha256:42dc45c8bcfbe8a384f885cbcc9c57da58bb62ef2fcfc01a588f9bbed27a243c",
+    "src/components/TodoItem.tsx": "sha256:2d2aa099aeba1a68a485f8da1a3e8edf76113be441e6b8d68318bd984566dfae"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "step": "025-todo-filter-logic",
+  "completedAt": "2026-05-11T06:05:14.807Z",
+  "files": {
+    "src/components/TodoFilter.tsx": "sha256:c8d26f2a4a042a912f909919dfebf7bbd2a852e25bae056b5988897c1bb2fe86",
+    "src/components/TodoFilter.test.tsx": "sha256:3f302b24d2b10960589a69581f7c44ddd82393119f6d4d7c954737d71d12f379"
+  }
+}

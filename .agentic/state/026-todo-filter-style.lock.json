@@ -1,0 +1,9 @@
+{
+  "step": "026-todo-filter-style",
+  "completedAt": "2026-05-11T06:05:39.085Z",
+  "files": {
+    "src/components/TodoFilter.module.css": "sha256:cce9b60bc8c947a69481023af5391a29c6d2a3921a063ee1685c79a2ca2a2eb3",
+    "src/components/TodoFilter.style.test.tsx": "sha256:fe763b73ef26079ae9a13abfc30d84ad25a182bc50830472283dc7268203ad99",
+    "src/components/TodoFilter.tsx": "sha256:c8d26f2a4a042a912f909919dfebf7bbd2a852e25bae056b5988897c1bb2fe86"
+  }
+}

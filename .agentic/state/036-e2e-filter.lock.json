@@ -1,0 +1,7 @@
+{
+  "step": "036-e2e-filter",
+  "completedAt": "2026-05-11T06:46:50.837Z",
+  "files": {
+    "e2e/filter.spec.ts": "sha256:666c1105f14e2424656df99e47dacecb7eb1b4cfc9d676cc38f64ff02ecb3d80"
+  }
+}

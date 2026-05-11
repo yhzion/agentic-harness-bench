@@ -1,0 +1,8 @@
+{
+  "step": "001-scaffold-config",
+  "completedAt": "2026-05-11T03:53:19.273Z",
+  "files": {
+    "package.json": "sha256:31b475c0d5006b79d725affabc6b0b1b2c68977563e82cff9f09f6090a29d3f5",
+    "src/vite-env.d.ts": "sha256:65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+  }
+}

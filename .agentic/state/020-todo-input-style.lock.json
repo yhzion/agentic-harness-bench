@@ -1,0 +1,9 @@
+{
+  "step": "020-todo-input-style",
+  "completedAt": "2026-05-11T05:47:08.198Z",
+  "files": {
+    "src/components/TodoInput.module.css": "sha256:7d0b39140428499235245a810195c9e3202c33d9af4b9de0bcee8242e02d1248",
+    "src/components/TodoInput.style.test.tsx": "sha256:7c1e9cb439c16a150a014382da0a7aa90951ba1c260d738a7cbead48f8558860",
+    "src/components/TodoInput.tsx": "sha256:00b03b776d479fc8a3e4714b70c387d5b7f58b6033f2549ade5f7fc345570dc3"
+  }
+}

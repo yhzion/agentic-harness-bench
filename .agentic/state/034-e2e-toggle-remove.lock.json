@@ -1,0 +1,7 @@
+{
+  "step": "034-e2e-toggle-remove",
+  "completedAt": "2026-05-11T06:42:42.967Z",
+  "files": {
+    "e2e/toggle-remove.spec.ts": "sha256:6a4073d0613cf0c612bc18345da4247e9e24fd4c1f884a3c21ae37b145386c36"
+  }
+}

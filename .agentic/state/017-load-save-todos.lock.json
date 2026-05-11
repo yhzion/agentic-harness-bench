@@ -1,0 +1,8 @@
+{
+  "step": "017-load-save-todos",
+  "completedAt": "2026-05-11T05:42:56.919Z",
+  "files": {
+    "src/storage/todoStorage.ts": "sha256:7f210e6228a752ccefdf5f65f70dcdecbef5f4e3f7f40410902fd06f3ad7ca4c",
+    "src/storage/todoStorage.test.ts": "sha256:74bb7e8460ddb74e70184f2a95909e64318ee6b521059add5b93bf1522ac5080"
+  }
+}

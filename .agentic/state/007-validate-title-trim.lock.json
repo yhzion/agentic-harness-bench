@@ -1,0 +1,8 @@
+{
+  "step": "007-validate-title-trim",
+  "completedAt": "2026-05-11T04:20:30.830Z",
+  "files": {
+    "src/domain/validateTodoTitle.ts": "sha256:0d073698c1d748902b4b51e5801eef0ff6f158bf974237f9e9454eb7dde77655",
+    "src/domain/validateTodoTitle.test.ts": "sha256:64ebbfd0da05f09308a0a393dc60f929091d6bfa2a58d774456c675d2e3485c1"
+  }
+}

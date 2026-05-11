@@ -1,0 +1,8 @@
+{
+  "step": "021-todo-item-logic",
+  "completedAt": "2026-05-11T05:49:38.572Z",
+  "files": {
+    "src/components/TodoItem.tsx": "sha256:61254104b4c7f5774be26c95658c0ed32619c2eb6b16bb9139e9d66cf0cd5548",
+    "src/components/TodoItem.test.tsx": "sha256:853afc1109afe102d291d2b78762e259f3e9826c89b2a8506e13c7245774b7a8"
+  }
+}

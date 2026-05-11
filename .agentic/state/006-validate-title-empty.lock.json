@@ -1,0 +1,8 @@
+{
+  "step": "006-validate-title-empty",
+  "completedAt": "2026-05-11T04:16:00.148Z",
+  "files": {
+    "src/domain/validateTodoTitle.ts": "sha256:0d073698c1d748902b4b51e5801eef0ff6f158bf974237f9e9454eb7dde77655",
+    "src/domain/validateTodoTitle.test.ts": "sha256:d962c8615a83439574ab8cb0c1027a266a313a7a268dbea7bad5f35adc6f441f"
+  }
+}

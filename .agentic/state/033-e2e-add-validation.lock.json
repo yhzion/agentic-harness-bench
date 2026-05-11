@@ -1,0 +1,7 @@
+{
+  "step": "033-e2e-add-validation",
+  "completedAt": "2026-05-11T06:19:57.847Z",
+  "files": {
+    "e2e/add-validation.spec.ts": "sha256:e313cf968117f6ebb0d65019efc5e59be0a78c6ce36b691a72fe885b13a0319f"
+  }
+}

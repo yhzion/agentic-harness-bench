@@ -1,0 +1,9 @@
+{
+  "step": "024-todo-list-style",
+  "completedAt": "2026-05-11T06:00:29.537Z",
+  "files": {
+    "src/components/TodoList.module.css": "sha256:0c05888a0cd04dee8574c9a5466a4b028bcaed49125fd7d025fc815940b07544",
+    "src/components/TodoList.style.test.tsx": "sha256:cf3eac0e1b15f67cfa3789637766f7c88d523b42f2a099101714acd3d1db55ba",
+    "src/components/TodoList.tsx": "sha256:213f88fe9e20fbf4bdee56a76faf432075822ddc3721d2b0c546e9746e922453"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "step": "013-remove-todo",
+  "completedAt": "2026-05-11T04:24:07.649Z",
+  "files": {
+    "src/domain/removeTodo.ts": "sha256:62cdb43d89c84d37ac6ce337da1095df5310ca5c8d8379d59eb5c3bc3073aea7",
+    "src/domain/removeTodo.test.ts": "sha256:47a927bb457170b8de0a97ffc062d604a7086a3f4593b4bdd23473cacc150cdc"
+  }
+}

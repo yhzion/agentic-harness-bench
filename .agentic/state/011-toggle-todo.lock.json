@@ -1,0 +1,8 @@
+{
+  "step": "011-toggle-todo",
+  "completedAt": "2026-05-11T04:22:52.718Z",
+  "files": {
+    "src/domain/toggleTodo.ts": "sha256:a06fc3d1eac7747f4d9f522eadca8d15998e1e0fadd28f31bf80c4248a1a6e53",
+    "src/domain/toggleTodo.test.ts": "sha256:c482d5abb9ea082507ffca53bafb2c26741338ec4fd7960a082f06390fe974ff"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "step": "009-create-todo",
+  "completedAt": "2026-05-11T04:21:37.899Z",
+  "files": {
+    "src/domain/createTodo.ts": "sha256:4aaf50d71561826d24cd93c6f6f19901a970442be44d0267c7e8c5943823592c",
+    "src/domain/createTodo.test.ts": "sha256:c8987e35de5be157a443c50d7deb24fef0c1f8d996c70607e22b42b53e9c873c"
+  }
+}

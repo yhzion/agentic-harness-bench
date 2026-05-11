@@ -1,0 +1,9 @@
+{
+  "step": "005-define-todo-types",
+  "completedAt": "2026-05-11T03:55:25.255Z",
+  "files": {
+    "src/types/todo.ts": "sha256:7938767f02b214db69a390577b79bf7f556dea6e55d2a72e6c3a5a32fd97b817",
+    "src/types/todo.test.ts": "sha256:a13ea786e142838d86f7695f2d9c241c569430c134c89db33359534366cf1752",
+    "src/types/index.ts": "sha256:8220a5dde64dcdd5117bf42bfb4d5279fd0906a195ac4a571517227d775aaad4"
+  }
+}

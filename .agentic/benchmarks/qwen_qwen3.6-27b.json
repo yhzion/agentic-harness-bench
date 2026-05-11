@@ -1,0 +1,549 @@
+{
+  "tag": "qwen/qwen3.6-27b",
+  "rubric_version": "1.0.0",
+  "rubric_sha256": "f27b5b9df8a5145cddd9479bae581172e6e6610d053f62d4bccf2099f9544298",
+  "generated_at": "2026-05-11T06:50:45.514Z",
+  "fingerprint": {
+    "progress_sha256": "2e64b1112f395500d03562b9c9c3fcd90b32afebda52c694b71a72aa166f2b4a",
+    "runtime_stats_sha256": "e69fab4de7f4526b11e7d4aae8aaa355f2413fd4b7633b5cac50a99eb414aa70"
+  },
+  "axis_scores": {
+    "correctness": 1,
+    "robustness": 1,
+    "quality": 1,
+    "efficiency": 0.7189189189189189,
+    "discipline": 0.65
+  },
+  "final_score_0_to_100": 93.7,
+  "metrics_detail": {
+    "correctness": {
+      "step_pass_rate": {
+        "raw": 37,
+        "max": 37,
+        "normalized": 1
+      }
+    },
+    "robustness": {
+      "e2e_happy_pass": {
+        "raw": 19,
+        "observed_total": 19,
+        "max": 4,
+        "normalized": 1
+      },
+      "e2e_edge_pass": {
+        "raw": 31,
+        "observed_total": 31,
+        "max": 12,
+        "normalized": 1
+      }
+    },
+    "quality": {
+      "eslint_violations": {
+        "raw": 0,
+        "cap": 50,
+        "normalized": 1
+      },
+      "tsc_errors": {
+        "raw": 0,
+        "cap": 30,
+        "normalized": 1
+      },
+      "design_token_violations": {
+        "raw": 0,
+        "cap": 20,
+        "normalized": 1
+      },
+      "a11y_violations": {
+        "raw": 0,
+        "cap": 10,
+        "normalized": 1
+      }
+    },
+    "efficiency": {
+      "first_pass_rate": {
+        "raw": 0.8918918918918919,
+        "first_pass_count": 33,
+        "total_completed": 37,
+        "normalized": 0.8918918918918919
+      },
+      "avg_retries": {
+        "raw": 0.2702702702702703,
+        "total_attempts": 47,
+        "total_completed": 37,
+        "cap": 3,
+        "normalized": 0.9099099099099099
+      },
+      "wall_time_seconds": {
+        "raw": 8787.194,
+        "cap": 7200,
+        "normalized": 0
+      }
+    },
+    "discipline": {
+      "scope_violations": {
+        "raw": 14,
+        "cap": 20,
+        "normalized": 0.30000000000000004
+      },
+      "signature_violations": {
+        "raw": 0,
+        "cap": 10,
+        "normalized": 1
+      }
+    }
+  },
+  "token_totals": {
+    "input": 30039494,
+    "output": 442037,
+    "cache_read": 0
+  },
+  "wall_time_seconds": 8787.19,
+  "output_tok_per_sec": 50.3,
+  "steps_completed": 37,
+  "per_step": [
+    {
+      "step_num": 1,
+      "step_name": "001-scaffold-config",
+      "attempts": 1,
+      "elapsed_ms": 31914,
+      "in": 28189,
+      "out": 1327,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 41.58
+    },
+    {
+      "step_num": 2,
+      "step_name": "002-scaffold-entries",
+      "attempts": 1,
+      "elapsed_ms": 24551,
+      "in": 36147,
+      "out": 1187,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 48.35
+    },
+    {
+      "step_num": 3,
+      "step_name": "003-wire-strict-gate",
+      "attempts": 1,
+      "elapsed_ms": 18097,
+      "in": 17483,
+      "out": 548,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 30.28
+    },
+    {
+      "step_num": 4,
+      "step_name": "004-generate-tokens-css",
+      "attempts": 1,
+      "elapsed_ms": 34907,
+      "in": 33238,
+      "out": 1605,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 45.98
+    },
+    {
+      "step_num": 5,
+      "step_name": "005-define-todo-types",
+      "attempts": 1,
+      "elapsed_ms": 28789,
+      "in": 36666,
+      "out": 978,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 33.97
+    },
+    {
+      "step_num": 6,
+      "step_name": "006-validate-title-empty",
+      "attempts": 2,
+      "elapsed_ms": 1224181,
+      "in": 4726136,
+      "out": 63128,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 51.57
+    },
+    {
+      "step_num": 7,
+      "step_name": "007-validate-title-trim",
+      "attempts": 1,
+      "elapsed_ms": 263380,
+      "in": 635061,
+      "out": 14478,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 54.97
+    },
+    {
+      "step_num": 8,
+      "step_name": "008-validate-title-max-length",
+      "attempts": 1,
+      "elapsed_ms": 17214,
+      "in": 12660,
+      "out": 285,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 16.56
+    },
+    {
+      "step_num": 9,
+      "step_name": "009-create-todo",
+      "attempts": 1,
+      "elapsed_ms": 35574,
+      "in": 39819,
+      "out": 1517,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 42.64
+    },
+    {
+      "step_num": 10,
+      "step_name": "010-add-todo",
+      "attempts": 1,
+      "elapsed_ms": 30182,
+      "in": 35061,
+      "out": 1133,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 37.54
+    },
+    {
+      "step_num": 11,
+      "step_name": "011-toggle-todo",
+      "attempts": 1,
+      "elapsed_ms": 29899,
+      "in": 36825,
+      "out": 1085,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 36.29
+    },
+    {
+      "step_num": 12,
+      "step_name": "012-update-todo-title",
+      "attempts": 1,
+      "elapsed_ms": 33691,
+      "in": 38050,
+      "out": 1323,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 39.27
+    },
+    {
+      "step_num": 13,
+      "step_name": "013-remove-todo",
+      "attempts": 1,
+      "elapsed_ms": 26069,
+      "in": 28294,
+      "out": 924,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 35.44
+    },
+    {
+      "step_num": 14,
+      "step_name": "014-filter-todos",
+      "attempts": 1,
+      "elapsed_ms": 25437,
+      "in": 28332,
+      "out": 875,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 34.4
+    },
+    {
+      "step_num": 15,
+      "step_name": "015-serialize-todos",
+      "attempts": 1,
+      "elapsed_ms": 23482,
+      "in": 27345,
+      "out": 733,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 31.22
+    },
+    {
+      "step_num": 16,
+      "step_name": "016-deserialize-todos",
+      "attempts": 1,
+      "elapsed_ms": 32967,
+      "in": 43009,
+      "out": 1198,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 36.34
+    },
+    {
+      "step_num": 17,
+      "step_name": "017-load-save-todos",
+      "attempts": 7,
+      "elapsed_ms": 3239137,
+      "in": 14190242,
+      "out": 166915,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 51.53
+    },
+    {
+      "step_num": 18,
+      "step_name": "018-use-todos-hook",
+      "attempts": 1,
+      "elapsed_ms": 51822,
+      "in": 74548,
+      "out": 2237,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 43.17
+    },
+    {
+      "step_num": 19,
+      "step_name": "019-todo-input-logic",
+      "attempts": 1,
+      "elapsed_ms": 80722,
+      "in": 154930,
+      "out": 3472,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 43.01
+    },
+    {
+      "step_num": 20,
+      "step_name": "020-todo-input-style",
+      "attempts": 1,
+      "elapsed_ms": 94103,
+      "in": 165933,
+      "out": 4740,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 50.37
+    },
+    {
+      "step_num": 21,
+      "step_name": "021-todo-item-logic",
+      "attempts": 1,
+      "elapsed_ms": 57191,
+      "in": 77128,
+      "out": 2236,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 39.1
+    },
+    {
+      "step_num": 22,
+      "step_name": "022-todo-item-style",
+      "attempts": 1,
+      "elapsed_ms": 104282,
+      "in": 316371,
+      "out": 4850,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 46.51
+    },
+    {
+      "step_num": 23,
+      "step_name": "023-todo-list-logic",
+      "attempts": 1,
+      "elapsed_ms": 39283,
+      "in": 32205,
+      "out": 1499,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 38.16
+    },
+    {
+      "step_num": 24,
+      "step_name": "024-todo-list-style",
+      "attempts": 2,
+      "elapsed_ms": 566459,
+      "in": 687505,
+      "out": 33588,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 59.29
+    },
+    {
+      "step_num": 25,
+      "step_name": "025-todo-filter-logic",
+      "attempts": 1,
+      "elapsed_ms": 46165,
+      "in": 68622,
+      "out": 1484,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 32.15
+    },
+    {
+      "step_num": 26,
+      "step_name": "026-todo-filter-style",
+      "attempts": 2,
+      "elapsed_ms": 245773,
+      "in": 643590,
+      "out": 12546,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 51.05
+    },
+    {
+      "step_num": 27,
+      "step_name": "027-app-shell-logic",
+      "attempts": 1,
+      "elapsed_ms": 81356,
+      "in": 195534,
+      "out": 3825,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 47.02
+    },
+    {
+      "step_num": 28,
+      "step_name": "028-app-shell-style",
+      "attempts": 1,
+      "elapsed_ms": 90240,
+      "in": 283707,
+      "out": 4067,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 45.07
+    },
+    {
+      "step_num": 29,
+      "step_name": "029-a11y-final-check",
+      "attempts": 1,
+      "elapsed_ms": 101397,
+      "in": 288632,
+      "out": 4253,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 41.94
+    },
+    {
+      "step_num": 30,
+      "step_name": "030-preview-check",
+      "attempts": 1,
+      "elapsed_ms": 41085,
+      "in": 51198,
+      "out": 1264,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 30.77
+    },
+    {
+      "step_num": 31,
+      "step_name": "031-e2e-infra",
+      "attempts": 1,
+      "elapsed_ms": 389675,
+      "in": 1241924,
+      "out": 19732,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 50.64
+    },
+    {
+      "step_num": 32,
+      "step_name": "032-e2e-add",
+      "attempts": 1,
+      "elapsed_ms": 29131,
+      "in": 13599,
+      "out": 697,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 23.93
+    },
+    {
+      "step_num": 33,
+      "step_name": "033-e2e-add-validation",
+      "attempts": 1,
+      "elapsed_ms": 40123,
+      "in": 26480,
+      "out": 1423,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 35.47
+    },
+    {
+      "step_num": 34,
+      "step_name": "034-e2e-toggle-remove",
+      "attempts": 2,
+      "elapsed_ms": 1347905,
+      "in": 5263697,
+      "out": 70411,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 52.24
+    },
+    {
+      "step_num": 35,
+      "step_name": "035-e2e-edit",
+      "attempts": 1,
+      "elapsed_ms": 170751,
+      "in": 406619,
+      "out": 7109,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 41.63
+    },
+    {
+      "step_num": 36,
+      "step_name": "036-e2e-filter",
+      "attempts": 1,
+      "elapsed_ms": 42527,
+      "in": 27363,
+      "out": 1479,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 34.78
+    },
+    {
+      "step_num": 37,
+      "step_name": "037-e2e-persistence",
+      "attempts": 1,
+      "elapsed_ms": 47733,
+      "in": 27352,
+      "out": 1886,
+      "cache_read": 0,
+      "pi_exit": 0,
+      "gate_pass": true,
+      "tok_per_s": 39.51
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+/* STEP 028 - App Shell 스타일 */
+
+.hero {
+  background-color: var(--color-surface-dark);
+  color: var(--color-on-dark);
+  padding: var(--space-section);
+}
+
+.hero h1 {
+  font-size: var(--type-display-xl-size);
+  line-height: var(--type-display-xl-line);
+  font-weight: var(--font-weight-display);
+  margin: 0;
+}
+
+.container {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.body {
+  padding: var(--space-section);
+  background-color: var(--color-canvas);
+}
+
+.footer {
+  background-color: var(--color-surface-soft);
+  color: var(--color-body);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line);
+  padding: 64px;
+}

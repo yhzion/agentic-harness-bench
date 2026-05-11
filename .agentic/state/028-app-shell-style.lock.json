@@ -1,0 +1,9 @@
+{
+  "step": "028-app-shell-style",
+  "completedAt": "2026-05-11T06:08:48.186Z",
+  "files": {
+    "src/App.module.css": "sha256:59f57b0e84fd4985cbae09359a8af30f874aba2266850a794b55d549335274ea",
+    "src/App.style.test.tsx": "sha256:9d2e1476443c72b7b0c31ecebe8b64229bd3fdaa37233f25c1bdd54c18efe58f",
+    "src/App.tsx": "sha256:06989009fe6b29fd43fd4b963f1d2be3aff71da7af6f744018af6821fdf6e655"
+  }
+}

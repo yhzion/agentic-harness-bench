@@ -1,0 +1,8 @@
+{
+  "step": "012-update-todo-title",
+  "completedAt": "2026-05-11T04:23:33.919Z",
+  "files": {
+    "src/domain/updateTodoTitle.ts": "sha256:9272d37d117044263dbb7cba5f6eddc4aabe7ef1f1fb30d353c465080fe2d4d1",
+    "src/domain/updateTodoTitle.test.ts": "sha256:bc90f4fbaefc431aef3312781cef6b286e63c073cc648221bdda58e7f57dfa69"
+  }
+}

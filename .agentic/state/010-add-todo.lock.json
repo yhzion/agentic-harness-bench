@@ -1,0 +1,8 @@
+{
+  "step": "010-add-todo",
+  "completedAt": "2026-05-11T04:22:15.364Z",
+  "files": {
+    "src/domain/addTodo.ts": "sha256:a67d24daa522d8c9ff12be468f144f3c325e644946a48fe26dd39e7418f18ac3",
+    "src/domain/addTodo.test.ts": "sha256:2422f5b08580296666926b5a027fbcda64d3059e9f871585e0ab4278a9cf51b6"
+  }
+}

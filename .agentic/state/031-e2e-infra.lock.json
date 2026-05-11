@@ -1,0 +1,10 @@
+{
+  "step": "031-e2e-infra",
+  "completedAt": "2026-05-11T06:18:16.845Z",
+  "files": {
+    "package.json": "sha256:c230cb2f4007aa6424091d7be815bb147a8ea41cee881944b9963cccd87a88ac",
+    "playwright.config.ts": "sha256:b8108bcea193cb2dc0852e53b64e3e12734e91d8e4808e317dfbc8a7231a55ca",
+    "e2e/_fixtures.ts": "sha256:bc0ba4da846f7aa31a8ed1feab84c4a1bff7b2a5cdd39dea40777dac450f7788",
+    "e2e/smoke.spec.ts": "sha256:f8f136004c37823a1a8afb59ea2eabc7e368e456b3be12711c9be61efb6e12c4"
+  }
+}

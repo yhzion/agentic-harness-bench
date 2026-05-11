@@ -1,0 +1,8 @@
+{
+  "step": "019-todo-input-logic",
+  "completedAt": "2026-05-11T05:46:47.022Z",
+  "files": {
+    "src/components/TodoInput.tsx": "sha256:00b03b776d479fc8a3e4714b70c387d5b7f58b6033f2549ade5f7fc345570dc3",
+    "src/components/TodoInput.test.tsx": "sha256:4365e9dd645801785e41c46002af67eb944a7c4e4b5ae44ea4ff588996643a67"
+  }
+}

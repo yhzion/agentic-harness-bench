@@ -1,0 +1,8 @@
+{
+  "step": "016-deserialize-todos",
+  "completedAt": "2026-05-11T04:25:52.525Z",
+  "files": {
+    "src/storage/deserializeTodos.ts": "sha256:9398ca56f6589ea89214a7ea5ddd51a38edab87876bcdf541164e75fb0e2d3bf",
+    "src/storage/deserializeTodos.test.ts": "sha256:fb008e39ec6ca139fa8c80682d5f6671f46e7db3a91fcd57d9a3f3e3648d7781"
+  }
+}

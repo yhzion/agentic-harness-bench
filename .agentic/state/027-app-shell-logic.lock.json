@@ -1,0 +1,8 @@
+{
+  "step": "027-app-shell-logic",
+  "completedAt": "2026-05-11T06:08:24.049Z",
+  "files": {
+    "src/App.tsx": "sha256:06989009fe6b29fd43fd4b963f1d2be3aff71da7af6f744018af6821fdf6e655",
+    "src/App.test.tsx": "sha256:ee8e1682f54333a3a2d37f6cc12dfd0a35fe338d5f43e8f7d351789d1d630764"
+  }
+}

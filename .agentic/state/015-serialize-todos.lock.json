@@ -1,0 +1,8 @@
+{
+  "step": "015-serialize-todos",
+  "completedAt": "2026-05-11T04:25:11.834Z",
+  "files": {
+    "src/storage/serializeTodos.ts": "sha256:7b72a1d2ff092b611d70ea1f11a53b2c2d755d028023598dbabe877e329f943b",
+    "src/storage/serializeTodos.test.ts": "sha256:825dbbd1f750398b930731f3e5e1af74735d5525ae4257213f7c3fdcd4b2ca80"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "step": "035-e2e-edit",
+  "completedAt": "2026-05-11T06:45:50.614Z",
+  "files": {
+    "e2e/edit.spec.ts": "sha256:1484b9016f4ecc9fb910dd94b5a5da535742bff42f24bc31f4f54738c23caae2"
+  }
+}

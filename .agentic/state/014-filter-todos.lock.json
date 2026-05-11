@@ -1,0 +1,8 @@
+{
+  "step": "014-filter-todos",
+  "completedAt": "2026-05-11T04:24:40.567Z",
+  "files": {
+    "src/domain/filterTodos.ts": "sha256:846e521870b56240761bb76f3dfcef38a21027be3c9a1099bd279e093328cd67",
+    "src/domain/filterTodos.test.ts": "sha256:5695cb21e057164d57ff7c97a82b32a875844ae9c4744fb1ff310935d4efa529"
+  }
+}

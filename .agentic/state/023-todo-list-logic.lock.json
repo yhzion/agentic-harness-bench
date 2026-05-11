@@ -1,0 +1,8 @@
+{
+  "step": "023-todo-list-logic",
+  "completedAt": "2026-05-11T05:59:50.694Z",
+  "files": {
+    "src/components/TodoList.tsx": "sha256:213f88fe9e20fbf4bdee56a76faf432075822ddc3721d2b0c546e9746e922453",
+    "src/components/TodoList.test.tsx": "sha256:8e5abfa2f49213c207f33cdb0551f44305470afd7c6213d076694edd621a3f58"
+  }
+}

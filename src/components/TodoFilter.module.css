@@ -1,0 +1,22 @@
+.group {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.tab {
+  background: transparent;
+  color: var(--color-muted);
+  font-size: var(--type-label-size);
+  font-weight: var(--font-weight-display);
+  letter-spacing: var(--type-label-tracking);
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--radius-none);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+}
+
+.tabActive {
+  color: var(--color-ink);
+  border-bottom: 2px solid var(--color-ink);
+}

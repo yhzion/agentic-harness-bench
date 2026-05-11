@@ -1,0 +1,10 @@
+{
+  "step": "002-scaffold-entries",
+  "completedAt": "2026-05-11T06:06:45.007Z",
+  "files": {
+    "index.html": "sha256:2a9e4118c4afdae3eb3fe85bb07df14b78e04bce7b16500b9b33a2345cf2d57e",
+    "src/main.tsx": "sha256:1c776c8dd5b453eb4ef12ea220c188127acee96d518fcbe2e92e37d93c5cfe8e",
+    "src/App.tsx": "sha256:55214c79b944d34e779707aaf41caba0562a6101cf8c9ded5ebd9ca090c0ddf2",
+    "src/test/setup.ts": "sha256:977afde26bba6a51325908cd7713cbfdc87d18f06b78b237c8f364c44864b7de"
+  }
+}

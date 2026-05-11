@@ -1,0 +1,8 @@
+{
+  "step": "018-use-todos-hook",
+  "completedAt": "2026-05-11T05:43:56.652Z",
+  "files": {
+    "src/hooks/useTodos.ts": "sha256:353176071055749dbf1743d0c3f519f69eecda627c2b546a2cdf41d1a7e60154",
+    "src/hooks/useTodos.test.tsx": "sha256:7dbf8370d785621a3ffbde42e497195a6dffafe305dbb4d02480fd9e2ae1653e"
+  }
+}
