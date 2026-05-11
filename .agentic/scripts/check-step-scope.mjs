@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
+import crypto from 'node:crypto'
 import {
   currentStepName,
   editableFilesForCurrentStep,
@@ -37,10 +38,17 @@ if (allowedFiles.length === 0) {
 }
 
 const baseline = readBaseline(baselineFile)
+const priorLocks = readPriorStepLocks()
 const outside = changedFiles.filter((file) => {
-  if (baseline.has(file)) return false
   if (isGeneratedPath(file)) return false
-  return !isPathAllowed(file, allowedFiles)
+  if (isPathAllowed(file, allowedFiles)) return false
+  // A file owned by a previously-completed STEP: violation only if its current content
+  // differs from the locked sha. Same-sha = untouched (allowed even if git status lists it).
+  if (priorLocks.has(file)) {
+    return hashOnDisk(file) !== priorLocks.get(file)
+  }
+  if (baseline.has(file)) return false
+  return true
 })
 
 if (outside.length > 0) {
@@ -84,6 +92,38 @@ function gitChangedFiles() {
       const file = line.slice(3)
       return normalizePath(file.includes(' -> ') ? file.split(' -> ').pop() : file)
     })
+}
+
+function readPriorStepLocks() {
+  // Returns Map<relPath, sha256> — the most recent locked sha wins (later steps may relock).
+  const locks = new Map()
+  const progressPath = path.join(root, '.agentic', 'progress.json')
+  const stateDir = path.join(root, '.agentic', 'state')
+  let completed = []
+  try {
+    const progress = JSON.parse(fs.readFileSync(progressPath, 'utf8'))
+    completed = Array.isArray(progress.completedSteps) ? progress.completedSteps : []
+  } catch {
+    return locks
+  }
+  for (const stepName of completed) {
+    const lockPath = path.join(stateDir, `${stepName}.lock.json`)
+    try {
+      const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'))
+      for (const [rel, sha] of Object.entries(lock.files || {})) {
+        locks.set(normalizePath(rel), sha)
+      }
+    } catch {
+      // missing/invalid lock — handled by verify-step-snapshots; ignore here
+    }
+  }
+  return locks
+}
+
+function hashOnDisk(rel) {
+  const abs = path.join(root, rel)
+  if (!fs.existsSync(abs)) return null
+  return 'sha256:' + crypto.createHash('sha256').update(fs.readFileSync(abs)).digest('hex')
 }
 
 function readBaseline(file) {
