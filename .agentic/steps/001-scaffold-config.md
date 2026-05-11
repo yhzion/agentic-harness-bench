@@ -1,7 +1,9 @@
-# STEP 001. 스캐폴딩 — 패키지 + 도구 설정
+# STEP 001. 스캐폴딩 — 패키지 + ambient 타입 선언
 
 ## 작업 단위
-package.json 과 모든 도구 설정 파일(10개)을 생성한다. 진입점(index.html / src 컴포넌트 코드)은 STEP 002의 책임이며 이 STEP에서는 작성하지 않는다. 단, `src/vite-env.d.ts`는 Vite의 CSS / CSS Module side-effect import 가 strict TypeScript 환경에서 컴파일되도록 하는 ambient 타입 선언 파일이므로 본 STEP의 스캐폴딩에 포함한다.
+`package.json`을 아래 verbatim 내용으로 교체하고, `src/vite-env.d.ts`를 신규 작성한다. 진입점(index.html / src 컴포넌트 코드)은 STEP 002의 책임이며 이 STEP에서는 작성하지 않는다. `src/vite-env.d.ts`는 Vite의 CSS / CSS Module side-effect import 가 strict TypeScript 환경에서 컴파일되도록 하는 ambient 타입 선언 파일이다.
+
+**인프라 설정 파일(`eslint.config.js`, `.prettierrc.json`, `tsconfig.json`, `tsconfig.node.json`, `vite.config.ts`, `vitest.config.ts`, `.gitignore`, `.prettierignore`)은 리포 베이스라인으로 이미 커밋되어 있다. 본 STEP에서 그 파일들을 생성·수정하지 않는다.**
 
 ## 기술 스택 (정확한 버전 범위 — 임의 변경 금지)
 
@@ -85,134 +87,6 @@ prettier                     ^3.0.0
 }
 ```
 
-### tsconfig.json (신규)
-
-```json
-{
-  "compilerOptions": {
-    "target": "ES2022",
-    "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "types": ["vitest/globals", "@testing-library/jest-dom"]
-  },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
-}
-```
-
-### tsconfig.node.json (신규)
-
-```json
-{
-  "compilerOptions": {
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "skipLibCheck": true
-  },
-  "include": ["vite.config.ts", "vitest.config.ts"]
-}
-```
-
-### vite.config.ts (신규)
-
-```ts
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-})
-```
-
-### vitest.config.ts (신규)
-
-```ts
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    globals: true,
-    setupFiles: ['./src/test/setup.ts'],
-    css: true,
-  },
-})
-```
-
-### eslint.config.js (신규)
-
-```js
-import js from '@eslint/js'
-import tseslint from 'typescript-eslint'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import jsxA11y from 'eslint-plugin-jsx-a11y'
-
-export default tseslint.config(
-  { ignores: ['dist', 'node_modules', '.agentic/scripts/**', '*.config.*'] },
-  {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ['**/*.{ts,tsx}'],
-    plugins: {
-      'react-hooks': reactHooks,
-      'react-refresh': reactRefresh,
-      'jsx-a11y': jsxA11y,
-    },
-    rules: {
-      ...reactHooks.configs.recommended.rules,
-      ...jsxA11y.configs.recommended.rules,
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-    },
-  },
-)
-```
-
-### .prettierrc.json (신규)
-
-```json
-{
-  "semi": false,
-  "singleQuote": true,
-  "trailingComma": "all",
-  "printWidth": 100,
-  "tabWidth": 2
-}
-```
-
-### .prettierignore (신규)
-
-```
-dist
-node_modules
-.agentic
-```
-
-### .gitignore (신규)
-
-```
-node_modules
-dist
-*.local
-.DS_Store
-```
-
 ### src/vite-env.d.ts (신규)
 
 ```ts
@@ -221,22 +95,15 @@ dist
 
 이 한 줄로 Vite 가 제공하는 ambient module 선언(`*.css`, `*.module.css`, `*.svg` 등)이 활성화되어, 이후 STEP 들에서 `import './foo.css'` 또는 `import styles from './bar.module.css'` 가 별도의 `// @ts-expect-error` 우회 없이 컴파일된다.
 
-## 수정 가능 파일 (정확히 10개)
+## 수정 가능 파일 (정확히 2개)
 - package.json
-- tsconfig.json
-- tsconfig.node.json
-- vite.config.ts
-- vitest.config.ts
-- eslint.config.js
-- .prettierrc.json
-- .prettierignore
-- .gitignore
 - src/vite-env.d.ts
 
 ## 수정 금지
 - `.agentic/contracts/benchmark-rubric.json` (모든 STEP에서 수정 금지)
 - `.agentic/contracts/benchmark-rubric.lock.json`
-- 위 10개 외 모든 파일 (.agentic/** 포함)
+- 위 2개 외 모든 파일 (.agentic/** 포함)
+- 인프라 설정 파일들(`eslint.config.js`, `.prettierrc.json`, `tsconfig.json`, `tsconfig.node.json`, `vite.config.ts`, `vitest.config.ts`, `.gitignore`, `.prettierignore`) — 리포 베이스라인이므로 수정 금지
 - src/** (STEP 002의 책임) — 단 위 목록의 `src/vite-env.d.ts` 만 예외로 허용
 - index.html (STEP 002의 책임)
 

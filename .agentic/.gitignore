@@ -1,10 +1,6 @@
 reports/*.tmp
 reports/failure-report.md
 reports/recovery-hint.md
-runtime-stats.json
-runtime-pi.log
-runtime-pi-stderr.log
-scope-baseline.json
-scope-violations.jsonl
-progress.json
-progress.md
+runtime-*
+scope-*
+progress.*

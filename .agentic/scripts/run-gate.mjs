@@ -25,6 +25,7 @@ const COMMANDS = {
     cmd('npm', ['test'], { script: 'test', introducedAt: 1, applicable: testFiles }),
   ],
   step: [
+    cmd('node', ['.agentic/scripts/verify-step-snapshots.mjs'], { introducedAt: 1 }),
     cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
     cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
     cmd('node', ['.agentic/scripts/check-src-imports.mjs'], { introducedAt: 1, applicable: codeFiles }),
@@ -56,6 +57,7 @@ const COMMANDS = {
     }),
   ],
   full: [
+    cmd('node', ['.agentic/scripts/verify-step-snapshots.mjs'], { introducedAt: 1 }),
     cmd('node', ['.agentic/scripts/check-step-scope.mjs'], { introducedAt: 1 }),
     cmd('node', ['.agentic/scripts/verify-tests-verbatim.mjs'], { introducedAt: 1 }),
     cmd('node', ['.agentic/scripts/check-src-imports.mjs'], { introducedAt: 1, applicable: codeFiles }),

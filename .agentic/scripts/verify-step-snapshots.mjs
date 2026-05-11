@@ -9,6 +9,19 @@ const progressPath = path.join(root, '.agentic', 'progress.json')
 
 const args = process.argv.slice(2)
 const backfill = args.includes('--backfill')
+const refreshAll = args.includes('--refresh-all-mismatched')
+const refreshSteps = new Set()
+for (let i = 0; i < args.length; i++) {
+  if (args[i] === '--refresh') {
+    const v = args[i + 1]
+    if (!v || v.startsWith('--')) {
+      console.error('[snapshot-verify] --refresh requires a STEP name')
+      process.exit(1)
+    }
+    refreshSteps.add(v)
+    i++
+  }
+}
 
 if (!fs.existsSync(progressPath)) {
   console.log('[snapshot-verify] no progress.json — nothing to verify')
@@ -26,6 +39,24 @@ if (completed.length === 0) {
 const expected = new Map()
 const lockedBy = new Map()
 const missingLocks = []
+
+if (refreshSteps.size > 0) {
+  for (const stepName of refreshSteps) {
+    if (!completed.includes(stepName)) {
+      console.error(`[snapshot-verify] --refresh ${stepName}: not in completedSteps; skipping`)
+      continue
+    }
+    try {
+      const { lockPath, fileCount } = snapshotStep(stepName)
+      console.log(
+        `[snapshot-verify] refreshed ${stepName} → ${path.relative(root, lockPath)} (${fileCount} files)`,
+      )
+    } catch (err) {
+      console.error(`[snapshot-verify] FAILED — could not refresh ${stepName}: ${err.message}`)
+      process.exit(1)
+    }
+  }
+}
 
 for (const stepName of completed) {
   const lockPath = path.join(stateDir, `${stepName}.lock.json`)
@@ -74,6 +105,28 @@ for (const [rel, sha] of expected) {
   }
 }
 
+if ((missingFiles.length > 0 || mismatches.length > 0) && refreshAll) {
+  const affected = new Set([
+    ...missingFiles.map((m) => m.lockedBy),
+    ...mismatches.map((m) => m.lockedBy),
+  ])
+  for (const stepName of affected) {
+    try {
+      const { lockPath, fileCount } = snapshotStep(stepName)
+      console.log(
+        `[snapshot-verify] refreshed ${stepName} → ${path.relative(root, lockPath)} (${fileCount} files)`,
+      )
+    } catch (err) {
+      console.error(`[snapshot-verify] FAILED — could not refresh ${stepName}: ${err.message}`)
+      process.exit(1)
+    }
+  }
+  console.log(
+    `[snapshot-verify] PASS (after --refresh-all-mismatched) — refreshed ${affected.size} step lock(s)`,
+  )
+  process.exit(0)
+}
+
 if (missingFiles.length > 0 || mismatches.length > 0) {
   console.error('[snapshot-verify] FAILED — committed STEP artifacts diverge from disk')
   for (const m of missingFiles) {
@@ -86,7 +139,8 @@ if (missingFiles.length > 0 || mismatches.length > 0) {
   }
   console.error('')
   console.error('A previous STEP\'s deliverable was lost or altered before the current STEP started.')
-  console.error('Restore it (e.g. `git checkout <step-commit> -- <file>`) and re-run.')
+  console.error('Restore it (e.g. `git checkout <step-commit> -- <file>`) and re-run,')
+  console.error('or `--refresh <step>` / `--refresh-all-mismatched` to re-snapshot from disk.')
   process.exit(1)
 }
 

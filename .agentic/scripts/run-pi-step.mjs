@@ -37,6 +37,10 @@ let stepCacheRead = 0
 let detectedModel = null
 let lastEventAt = Date.now()
 let turnIndex = 0
+let turnStart = null
+let turnToolMs = 0
+let stepToolMs = 0
+let stepGenMs = 0
 let currentThinking = null
 let currentText = null
 const toolStarts = new Map()
@@ -105,6 +109,8 @@ function handleLine(line) {
       return
     case 'turn_start':
       turnIndex += 1
+      turnStart = Date.now()
+      turnToolMs = 0
       if (!isQuiet) writeLine(`▸ turn ${turnIndex}`)
       return
     case 'turn_end': {
@@ -115,12 +121,17 @@ function handleLine(line) {
         stepCacheRead += Number(u.cacheRead || 0)
       }
       const stop = evt.message?.stopReason || '—'
+      const turnElapsed = turnStart != null ? Date.now() - turnStart : 0
+      const genMs = Math.max(0, turnElapsed - turnToolMs)
+      stepGenMs += genMs
+      stepToolMs += turnToolMs
       if (!isQuiet) {
-        const tps = formatTps(u?.output, lastEventAt - stepStart)
+        const tps = formatTps(u?.output, genMs)
         writeLine(
           `◂ turn ${turnIndex} · in=${u?.input ?? 0} out=${u?.output ?? 0} (${tps} tok/s · stop=${stop})`,
         )
       }
+      turnStart = null
       return
     }
     case 'message_start':
@@ -135,7 +146,9 @@ function handleLine(line) {
       return
     case 'tool_execution_end': {
       const startedAt = toolStarts.get(evt.toolCallId) ?? Date.now()
-      const dt = ((Date.now() - startedAt) / 1000).toFixed(1)
+      const toolMs = Date.now() - startedAt
+      turnToolMs += toolMs
+      const dt = (toolMs / 1000).toFixed(1)
       const isError = evt.isError === true || evt.result?.isError === true
       const content = evt.result?.content?.[0]?.text ?? ''
       const lines = content ? content.split('\n').length : 0
@@ -257,14 +270,15 @@ function finishStep(exitCode) {
   if (detectedModel) state.model = detectedModel
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2))
 
-  const tps = elapsed > 0 ? (stepOut / (elapsed / 1000)).toFixed(1) : '—'
+  const genTps = stepGenMs > 0 ? (stepOut / (stepGenMs / 1000)).toFixed(1) : '—'
+  const wallTps = elapsed > 0 ? (stepOut / (elapsed / 1000)).toFixed(1) : '—'
   const status = exitCode === 0 ? '✓ pi-ok' : `✗ pi-exit-${exitCode}`
 
   const summary =
     `╌╌ attempt ${args.attempt}/${args.maxRetry} done · ` +
-    `${(elapsed / 1000).toFixed(1)}s · ` +
+    `${(elapsed / 1000).toFixed(1)}s (gen ${(stepGenMs / 1000).toFixed(1)}s · tool ${(stepToolMs / 1000).toFixed(1)}s) · ` +
     `in=${stepIn} out=${stepOut} cacheR=${stepCacheRead} · ` +
-    `${tps} tok/s · ${status}`
+    `${genTps} tok/s gen (${wallTps} wall) · ${status}`
   process.stderr.write(summary + '\n')
 
   const entry = {
@@ -277,6 +291,9 @@ function finishStep(exitCode) {
     out: stepOut,
     cache_read: stepCacheRead,
     tok_per_s: elapsed > 0 ? Number((stepOut / (elapsed / 1000)).toFixed(2)) : 0,
+    tok_per_s_gen: stepGenMs > 0 ? Number((stepOut / (stepGenMs / 1000)).toFixed(2)) : 0,
+    gen_ms: stepGenMs,
+    tool_ms: stepToolMs,
     model: detectedModel || process.env.PI_MODEL || state.model || 'unknown',
     pi_exit: exitCode,
     gate_pass: null,
