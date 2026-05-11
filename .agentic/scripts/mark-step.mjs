@@ -1,5 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
+import { snapshotStep } from './snapshot-step.mjs'
 
 const result = process.argv[2]
 const message = process.argv.slice(3).join(' ')
@@ -30,6 +31,16 @@ if (currentIndex === -1) {
 const previousRetryCount = Number(progress.retryCount || 0)
 
 if (result === 'pass') {
+  try {
+    const { lockPath, fileCount } = snapshotStep(currentStep)
+    console.log(
+      `[snapshot] ${currentStep} → ${path.relative(root, lockPath)} (${fileCount} files)`,
+    )
+  } catch (err) {
+    console.error(`[snapshot] FAILED — ${err.message}`)
+    console.error('Refusing to mark step as PASS without an artifact snapshot.')
+    process.exit(1)
+  }
   if (!progress.completedSteps.includes(currentStep)) {
     progress.completedSteps.push(currentStep)
   }

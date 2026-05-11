@@ -39,6 +39,15 @@ TOTAL_STEPS="$(find .agentic/steps -maxdepth 1 -name '*.md' | wc -l | tr -d ' ')
 node .agentic/scripts/init-progress.mjs
 node .agentic/scripts/reset-runtime-stats.mjs
 
+# Sanity check on resume: every previously-passed STEP's deliverables must still
+# match the lock written by mark-step.mjs. Catches working-tree drift between
+# runs (the failure mode where STEP 001 was "passed" but its files vanished).
+if ! node .agentic/scripts/verify-step-snapshots.mjs; then
+  echo "[agentic] snapshot verification failed — refusing to start."
+  echo "[agentic] Restore the missing/modified files (or use --backfill) before retrying."
+  exit 1
+fi
+
 step_number_of() {
   local target_basename="$1"
   local n=0
@@ -134,6 +143,13 @@ while true; do
   printf "║ STEP %02d/%-2d  %5.1f%%  %-44s ║\n" "$STEP_NUM" "$TOTAL_STEPS" "$PCT" "$STEP_BASENAME"
   echo "║ model: ${PI_MODEL:-(auto)}   gate: $GATE_MODE   log: $LOG_LEVEL                       ║"
   echo "╚══════════════════════════════════════════════════════════════════╝"
+
+  # Re-verify before every STEP so a corruption between steps cannot silently
+  # be baked into the next baseline.
+  if ! node .agentic/scripts/verify-step-snapshots.mjs; then
+    echo "[agentic] snapshot verification failed before $STEP_BASENAME — aborting."
+    exit 1
+  fi
 
   node .agentic/scripts/check-step-scope.mjs --write-baseline "$SCOPE_BASELINE"
   rm -f "$RECOVERY_HINT"
