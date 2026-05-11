@@ -102,10 +102,21 @@ function isGeneratedPath(file) {
     file.startsWith('coverage/') ||
     file.startsWith('playwright-report/') ||
     file.startsWith('test-results/') ||
-    file === '.agentic/runtime-stats.json' ||
-    file === '.agentic/runtime-pi.log' ||
-    file === '.agentic/scope-baseline.json' ||
-    file === '.agentic/scope-violations.jsonl'
+    isAgenticRuntimePath(file)
+  )
+}
+
+// Harness runtime artifacts under .agentic/ — must not influence STEP scope.
+// Matched by prefix so new telemetry files (runtime-*, scope-*, progress.*, reports/*)
+// are absorbed automatically without touching the allowlist.
+function isAgenticRuntimePath(file) {
+  if (!file.startsWith('.agentic/')) return false
+  const rest = file.slice('.agentic/'.length)
+  return (
+    rest.startsWith('runtime-') ||
+    rest.startsWith('scope-') ||
+    rest.startsWith('progress.') ||
+    rest.startsWith('reports/')
   )
 }
 
