@@ -314,6 +314,43 @@ for (const [axisName, axisDef] of Object.entries(rubric.axes)) {
 }
 const finalScore = Math.round(clamp01(weightedTotal) * 1000) / 10
 
+function loadStepLog() {
+  const p = path.join(root, '.agentic', 'runtime-step-log.jsonl')
+  if (!fs.existsSync(p)) return []
+  return fs.readFileSync(p, 'utf8')
+    .split('\n')
+    .filter((l) => l.trim() !== '')
+    .map((l) => { try { return JSON.parse(l) } catch { return null } })
+    .filter(Boolean)
+}
+
+function summarizeSteps(entries) {
+  const byStep = new Map()
+  for (const e of entries) {
+    const key = e.step_name || String(e.step_num)
+    const acc = byStep.get(key) || {
+      step_num: e.step_num, step_name: e.step_name,
+      attempts: 0, elapsed_ms: 0, in: 0, out: 0, cache_read: 0,
+      pi_exit: e.pi_exit, gate_pass: e.gate_pass,
+    }
+    acc.attempts += 1
+    acc.elapsed_ms += Number(e.elapsed_ms || 0)
+    acc.in += Number(e.in || 0)
+    acc.out += Number(e.out || 0)
+    acc.cache_read += Number(e.cache_read || 0)
+    // 마지막 attempt 의 최종 결과로 갱신
+    acc.pi_exit = e.pi_exit
+    acc.gate_pass = e.gate_pass
+    byStep.set(key, acc)
+  }
+  return Array.from(byStep.values())
+    .sort((a, b) => (a.step_num || 0) - (b.step_num || 0))
+    .map((s) => ({
+      ...s,
+      tok_per_s: s.elapsed_ms > 0 ? Number((s.out / (s.elapsed_ms / 1000)).toFixed(2)) : 0,
+    }))
+}
+
 const tag = process.env.MODEL_TAG || runtimeStats.model || 'unknown-model'
 const output = {
   tag,
@@ -334,6 +371,18 @@ const output = {
   final_score_0_to_100: finalScore,
   metrics_detail: metrics,
 }
+
+const stepEntries = loadStepLog()
+const per_step = summarizeSteps(stepEntries)
+const tokenIn = per_step.reduce((s, x) => s + (x.in || 0), 0)
+const tokenOut = per_step.reduce((s, x) => s + (x.out || 0), 0)
+const tokenCacheRead = per_step.reduce((s, x) => s + (x.cache_read || 0), 0)
+const wallSec = (runtimeStats.totalElapsedMs || 0) / 1000
+output.token_totals = { input: tokenIn, output: tokenOut, cache_read: tokenCacheRead }
+output.wall_time_seconds = Number(wallSec.toFixed(2))
+output.output_tok_per_sec = wallSec > 0 ? Number((tokenOut / wallSec).toFixed(2)) : 0
+output.steps_completed = per_step.filter((s) => s.gate_pass === true).length
+output.per_step = per_step
 
 const outDir = path.join(root, '.agentic', 'benchmarks')
 fs.mkdirSync(outDir, { recursive: true })

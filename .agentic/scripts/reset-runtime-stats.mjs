@@ -5,6 +5,7 @@ const stateFile = path.join('.agentic', 'runtime-stats.json')
 const progressFile = path.join('.agentic', 'progress.json')
 const scopeBaselineFile = path.join('.agentic', 'scope-baseline.json')
 const scopeViolationsFile = path.join('.agentic', 'scope-violations.jsonl')
+const stepLogFile = path.join('.agentic', 'runtime-step-log.jsonl')
 
 const fresh = {
   totalIn: 0,
@@ -31,7 +32,7 @@ const progressEmpty = (() => {
 
 if (force || progressEmpty || !fs.existsSync(stateFile)) {
   fs.writeFileSync(stateFile, JSON.stringify(fresh, null, 2))
-  for (const file of [scopeBaselineFile, scopeViolationsFile]) {
+  for (const file of [scopeBaselineFile, scopeViolationsFile, stepLogFile]) {
     if (fs.existsSync(file)) fs.rmSync(file)
   }
   console.log(`[runtime-stats] reset → ${stateFile}`)

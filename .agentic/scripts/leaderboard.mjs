@@ -128,6 +128,53 @@ for (const r of runs) {
   out.push('')
 }
 
+out.push('## Token efficiency')
+out.push('')
+out.push('| Rank | Model tag | Steps✓ | Wall(s) | In total | Out total | Out/step | Tok/s |')
+out.push('|---:|:---|---:|---:|---:|---:|---:|---:|')
+
+const tokenRows = runs
+  .map((r) => {
+    const t = r.token_totals || { input: 0, output: 0, cache_read: 0 }
+    const stepsOk = r.steps_completed || 0
+    const outPerStep = stepsOk > 0 ? t.output / stepsOk : 0
+    return {
+      tag: r.tag,
+      stepsOk,
+      wall: r.wall_time_seconds || 0,
+      input: t.input || 0,
+      output: t.output || 0,
+      outPerStep,
+      tps: r.output_tok_per_sec || 0,
+    }
+  })
+  .sort((a, b) => b.tps - a.tps)
+
+tokenRows.forEach((r, i) => {
+  out.push(
+    `| ${i + 1} | \`${r.tag}\` | ${r.stepsOk} | ${fmt(r.wall, 1)} | ${r.input} | ${r.output} | ${fmt(r.outPerStep, 0)} | ${fmt(r.tps, 1)} |`,
+  )
+})
+out.push('')
+
+out.push('## Per-step breakdown')
+out.push('')
+for (const r of runs) {
+  if (!Array.isArray(r.per_step) || r.per_step.length === 0) continue
+  out.push(`### \`${r.tag}\``)
+  out.push('')
+  out.push('| # | Step | Attempts | Wall(s) | In | Out | Tok/s | Gate |')
+  out.push('|---:|:---|---:|---:|---:|---:|---:|:---:|')
+  for (const s of r.per_step) {
+    const wall = (s.elapsed_ms || 0) / 1000
+    const gate = s.gate_pass === true ? '✓' : s.gate_pass === false ? '✗' : '—'
+    out.push(
+      `| ${s.step_num ?? '—'} | ${s.step_name ?? '—'} | ${s.attempts ?? 1} | ${fmt(wall, 1)} | ${s.in ?? 0} | ${s.out ?? 0} | ${fmt(s.tok_per_s, 1)} | ${gate} |`,
+    )
+  }
+  out.push('')
+}
+
 const text = out.join('\n')
 const target = process.argv[2] || path.join(root, 'LEADERBOARD.md')
 fs.writeFileSync(target, text)

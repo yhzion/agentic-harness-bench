@@ -6,6 +6,8 @@ GATE_MODE="${GATE_MODE:-step}"
 PI_BIN="${PI_BIN:-pi}"
 PI_MODE="${PI_MODE:-json}"
 AUTO_COMMIT="${AUTO_COMMIT:-0}"
+LOG_LEVEL="${LOG_LEVEL:-normal}"
+export LOG_LEVEL
 PROMPT_TEMPLATE=".agentic/prompts/pi-step-implementer.md"
 SCOPE_BASELINE=".agentic/scope-baseline.json"
 RECOVERY_HINT=".agentic/reports/recovery-hint.md"
@@ -128,9 +130,10 @@ while true; do
   PCT="$(awk -v n="$STEP_NUM" -v t="$TOTAL_STEPS" 'BEGIN{printf "%.1f", (n-1)/t*100}')"
 
   echo ""
-  echo "═════════════════════════════════════════════════════════════"
-  echo "  STEP $STEP_NUM/$TOTAL_STEPS ($PCT%) → $STEP_BASENAME"
-  echo "═════════════════════════════════════════════════════════════"
+  echo "╔══════════════════════════════════════════════════════════════════╗"
+  printf "║ STEP %02d/%-2d  %5.1f%%  %-44s ║\n" "$STEP_NUM" "$TOTAL_STEPS" "$PCT" "$STEP_BASENAME"
+  echo "║ model: ${PI_MODEL:-(auto)}   gate: $GATE_MODE   log: $LOG_LEVEL                       ║"
+  echo "╚══════════════════════════════════════════════════════════════════╝"
 
   node .agentic/scripts/check-step-scope.mjs --write-baseline "$SCOPE_BASELINE"
   rm -f "$RECOVERY_HINT"
@@ -145,6 +148,7 @@ while true; do
       if npm run "agent:gate:$GATE_MODE" --silent; then
         echo "[agentic] ✓ gate passed for $STEP_BASENAME"
         node .agentic/scripts/mark-step.mjs pass
+        echo "╚══ STEP $STEP_NUM ✓ PASS  $STEP_BASENAME ══════════════════════════════╝"
         commit_step_if_enabled "$STEP_FILE"
         break
       fi
@@ -154,6 +158,7 @@ while true; do
 
     if [ "$attempt" -ge "$MAX_RETRY" ]; then
       echo "[agentic] max retries reached for $STEP_BASENAME"
+      echo "╚══ STEP $STEP_NUM ✗ FAIL  $STEP_BASENAME ══════════════════════════════╝"
       node .agentic/scripts/write-failure-report.mjs "$STEP_FILE" "Max retries reached."
       exit 1
     fi

@@ -4,7 +4,21 @@ import path from 'node:path'
 
 const STATE_FILE = path.join('.agentic', 'runtime-stats.json')
 const RAW_LOG = path.join('.agentic', 'runtime-pi.log')
-const baseState = { totalIn: 0, totalOut: 0, totalElapsedMs: 0, completedSteps: 0, model: null }
+const STEP_LOG = path.join('.agentic', 'runtime-step-log.jsonl')
+const baseState = {
+  totalIn: 0,
+  totalOut: 0,
+  totalCacheRead: 0,
+  totalElapsedMs: 0,
+  completedSteps: 0,
+  model: null,
+}
+
+const LEVEL = (process.env.LOG_LEVEL || 'normal').toLowerCase()
+const isQuiet = LEVEL === 'quiet'
+const isDebug = LEVEL === 'debug'
+const HEARTBEAT_MS = Number(process.env.HEARTBEAT_MS || 5000)
+const THROTTLE_MS = 200
 
 const args = parseArgs(process.argv.slice(2))
 const required = ['stepNum', 'total', 'stepName', 'attempt', 'maxRetry', 'promptFile', 'piBin', 'piMode']
@@ -19,7 +33,13 @@ const state = readState()
 const stepStart = Date.now()
 let stepIn = 0
 let stepOut = 0
+let stepCacheRead = 0
 let detectedModel = null
+let lastEventAt = Date.now()
+let turnIndex = 0
+let currentThinking = null
+let currentText = null
+const toolStarts = new Map()
 
 const prompt = fs.readFileSync(args.promptFile, 'utf8')
 fs.writeFileSync(RAW_LOG, '')
@@ -42,12 +62,22 @@ child.stderr.on('data', (chunk) => {
 })
 
 child.on('error', (err) => {
-  process.stderr.write(`\n[run-pi-step] spawn error: ${err.message}\n`)
+  writeLine(`✗ spawn error: ${err.message}`, true)
   finishStep(1)
   process.exit(1)
 })
 
+const heartbeat = setInterval(() => {
+  const silent = Date.now() - lastEventAt
+  if (silent >= HEARTBEAT_MS && !isQuiet) {
+    const elapsedSec = ((Date.now() - stepStart) / 1000).toFixed(1)
+    writeLine(`· … still running (silent ${(silent / 1000).toFixed(0)}s · elapsed ${elapsedSec}s)`)
+    lastEventAt = Date.now()
+  }
+}, 1500)
+
 child.on('close', (code) => {
+  clearInterval(heartbeat)
   if (stdoutBuf) handleLine(stdoutBuf)
   finishStep(code ?? 1)
   process.exit(code ?? 1)
@@ -61,59 +91,197 @@ function handleLine(line) {
   } catch {
     return
   }
+  lastEventAt = Date.now()
+
   if (!detectedModel) {
-    const m = evt.model ?? evt.system?.model ?? evt.message?.model ?? evt.metadata?.model
+    const m = evt.model ?? evt.message?.model ?? evt.assistantMessageEvent?.partial?.model
     if (typeof m === 'string') detectedModel = m
   }
-  const usage = evt.usage ?? evt.message?.usage ?? evt.delta?.usage ?? evt.metadata?.usage
-  if (usage) {
-    if (typeof usage.input_tokens === 'number') stepIn = usage.input_tokens
-    if (typeof usage.output_tokens === 'number') stepOut = usage.output_tokens
-    if (typeof usage.cache_read_input_tokens === 'number')
-      stepIn = Math.max(stepIn, usage.input_tokens ?? 0) + (usage.cache_read_input_tokens || 0)
+
+  switch (evt.type) {
+    case 'session':
+    case 'agent_start':
+    case 'agent_end':
+      return
+    case 'turn_start':
+      turnIndex += 1
+      if (!isQuiet) writeLine(`▸ turn ${turnIndex}`)
+      return
+    case 'turn_end': {
+      const u = evt.message?.usage
+      if (u) {
+        stepIn += Number(u.input || 0)
+        stepOut += Number(u.output || 0)
+        stepCacheRead += Number(u.cacheRead || 0)
+      }
+      const stop = evt.message?.stopReason || '—'
+      if (!isQuiet) {
+        const tps = formatTps(u?.output, lastEventAt - stepStart)
+        writeLine(
+          `◂ turn ${turnIndex} · in=${u?.input ?? 0} out=${u?.output ?? 0} (${tps} tok/s · stop=${stop})`,
+        )
+      }
+      return
+    }
+    case 'message_start':
+      return
+    case 'message_end':
+      return
+    case 'message_update':
+      handleAssistantUpdate(evt.assistantMessageEvent)
+      return
+    case 'tool_execution_start':
+      toolStarts.set(evt.toolCallId, Date.now())
+      return
+    case 'tool_execution_end': {
+      const startedAt = toolStarts.get(evt.toolCallId) ?? Date.now()
+      const dt = ((Date.now() - startedAt) / 1000).toFixed(1)
+      const isError = evt.isError === true || evt.result?.isError === true
+      const content = evt.result?.content?.[0]?.text ?? ''
+      const lines = content ? content.split('\n').length : 0
+      const sizeHint = lines ? ` ${lines}L` : ''
+      const errHint = isError ? ` ✗ ${truncate(content.split('\n')[0] || 'error', 60)}` : ''
+      if (!isQuiet) {
+        writeLine(`  ↳ ${isError ? '✗ error' : '✓ ok'} ${dt}s${sizeHint}${errHint}`)
+      }
+      toolStarts.delete(evt.toolCallId)
+      return
+    }
+    default:
+      return
   }
-  render()
 }
 
-const isTTY = Boolean(process.stderr.isTTY)
-let lastRenderAt = 0
-
-function render(force = false) {
-  const now = Date.now()
-  if (!force && now - lastRenderAt < 250) return
-  lastRenderAt = now
-
-  const pct = (((Number(args.stepNum) - 1) / Number(args.total)) * 100).toFixed(1)
-  const model = detectedModel || process.env.PI_MODEL || state.model || 'unknown'
-
-  const line =
-    `[${pad(args.stepNum, 2)}/${args.total}] ${pct.padStart(4)}% │ ` +
-    `${truncate(args.stepName, 32)} │ ${truncate(model, 22)} │ ` +
-    `try ${args.attempt}/${args.maxRetry}`
-
-  if (isTTY) {
-    process.stderr.write('\r\x1b[2K' + line)
-  } else {
-    process.stderr.write(line + '\n')
+function handleAssistantUpdate(inner) {
+  if (!inner) return
+  switch (inner.type) {
+    case 'thinking_start':
+      currentThinking = { start: Date.now() }
+      if (!isQuiet) writeLine('· thinking …')
+      return
+    case 'thinking_delta':
+      if (isDebug && inner.delta) {
+        const preview = String(inner.delta).replace(/\s+/g, ' ').slice(0, 80)
+        writeLine(`    · ${preview}`)
+      }
+      return
+    case 'thinking_end': {
+      const dt = currentThinking ? ((Date.now() - currentThinking.start) / 1000).toFixed(1) : '—'
+      const head = (inner.content || '').split('\n').find((l) => l.trim()) || ''
+      const preview = head ? `: ${truncate(head.trim(), 80)}` : ''
+      if (!isQuiet) writeLine(`  ↳ thought (${dt}s)${preview}`)
+      currentThinking = null
+      return
+    }
+    case 'text_start':
+      currentText = { start: Date.now() }
+      return
+    case 'text_delta':
+      return
+    case 'text_end': {
+      const txt = (inner.content || '').replace(/\s+/g, ' ').trim()
+      if (txt && !isQuiet) writeLine(`· say: ${truncate(txt, 100)}`)
+      currentText = null
+      return
+    }
+    case 'toolcall_start':
+    case 'toolcall_delta':
+      return
+    case 'toolcall_end': {
+      const tc = inner.toolCall
+      if (!tc) return
+      const argsBrief = briefArgs(tc.name, tc.arguments)
+      if (!isQuiet) writeLine(`· call ${tc.name}${argsBrief ? ' ' + argsBrief : ''}`)
+      return
+    }
+    default:
+      return
   }
+}
+
+function briefArgs(name, a) {
+  if (!a || typeof a !== 'object') return ''
+  const pick = (...keys) => {
+    for (const k of keys) if (typeof a[k] === 'string') return a[k]
+    return null
+  }
+  switch (name) {
+    case 'read':
+    case 'ls':
+    case 'glob':
+    case 'edit':
+    case 'write': {
+      const p = pick('path', 'file', 'filename', 'pattern')
+      return p ? short(p) : ''
+    }
+    case 'bash':
+    case 'shell': {
+      const cmd = pick('command', 'cmd', 'script')
+      return cmd ? `"${truncate(cmd, 70)}"` : ''
+    }
+    case 'grep':
+    case 'find': {
+      const q = pick('pattern', 'query', 'regex')
+      const p = pick('path', 'cwd')
+      return [q && `/${truncate(q, 40)}/`, p && `in ${short(p)}`].filter(Boolean).join(' ')
+    }
+    default: {
+      const k = Object.keys(a)[0]
+      if (!k) return ''
+      const v = a[k]
+      return typeof v === 'string' ? `${k}=${truncate(v, 60)}` : `${k}=…`
+    }
+  }
+}
+
+function short(p) {
+  const cwd = process.cwd() + '/'
+  return p.startsWith(cwd) ? p.slice(cwd.length) : truncate(p, 60)
+}
+
+function formatTps(out, elapsedMs) {
+  if (!out || elapsedMs <= 0) return '—'
+  return ((out / (elapsedMs / 1000)) || 0).toFixed(0)
+}
+
+function writeLine(s) {
+  process.stderr.write(s + '\n')
 }
 
 function finishStep(exitCode) {
   const elapsed = Date.now() - stepStart
   state.totalIn += stepIn
   state.totalOut += stepOut
+  state.totalCacheRead += stepCacheRead
   state.totalElapsedMs += elapsed
   if (detectedModel) state.model = detectedModel
   fs.writeFileSync(STATE_FILE, JSON.stringify(state, null, 2))
 
-  render(true)
-  if (isTTY) process.stderr.write('\n')
-
-  const stepTps = elapsed > 0 ? (stepOut / (elapsed / 1000)).toFixed(1) : '—'
+  const tps = elapsed > 0 ? (stepOut / (elapsed / 1000)).toFixed(1) : '—'
   const status = exitCode === 0 ? '✓ pi-ok' : `✗ pi-exit-${exitCode}`
-  process.stderr.write(
-    `  └─ step ${(elapsed / 1000).toFixed(1)}s │ in ${stepIn} │ out ${stepOut} │ ${stepTps} tok/s │ ${status}\n`,
-  )
+
+  const summary =
+    `╌╌ attempt ${args.attempt}/${args.maxRetry} done · ` +
+    `${(elapsed / 1000).toFixed(1)}s · ` +
+    `in=${stepIn} out=${stepOut} cacheR=${stepCacheRead} · ` +
+    `${tps} tok/s · ${status}`
+  process.stderr.write(summary + '\n')
+
+  const entry = {
+    ts: new Date().toISOString(),
+    step_num: Number(args.stepNum),
+    step_name: args.stepName,
+    attempt: Number(args.attempt),
+    elapsed_ms: elapsed,
+    in: stepIn,
+    out: stepOut,
+    cache_read: stepCacheRead,
+    tok_per_s: elapsed > 0 ? Number((stepOut / (elapsed / 1000)).toFixed(2)) : 0,
+    model: detectedModel || process.env.PI_MODEL || state.model || 'unknown',
+    pi_exit: exitCode,
+    gate_pass: null,
+  }
+  fs.appendFileSync(STEP_LOG, JSON.stringify(entry) + '\n')
 }
 
 function readState() {
@@ -126,11 +294,7 @@ function readState() {
 
 function truncate(str, n) {
   if (!str) return ''
-  return str.length <= n ? str.padEnd(n) : str.slice(0, n - 1) + '…'
-}
-
-function pad(v, n) {
-  return String(v).padStart(n)
+  return str.length <= n ? str : str.slice(0, n - 1) + '…'
 }
 
 function kebab(s) {

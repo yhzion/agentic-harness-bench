@@ -11,6 +11,7 @@ coverage/
 .agentic/reports/*.tmp
 .agentic/reports/recovery-hint.md
 .agentic/runtime-pi.log
+.agentic/runtime-step-log.jsonl
 .agentic/runtime-stats.json
 .agentic/scope-baseline.json
 .agentic/scope-violations.jsonl

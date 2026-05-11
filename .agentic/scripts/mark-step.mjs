@@ -13,6 +13,7 @@ const root = process.cwd()
 const agenticDir = path.join(root, '.agentic')
 const progressPath = path.join(agenticDir, 'progress.json')
 const runtimeStatsPath = path.join(agenticDir, 'runtime-stats.json')
+const stepLogPath = path.join(agenticDir, 'runtime-step-log.jsonl')
 const stepsDir = path.join(agenticDir, 'steps')
 
 const progress = JSON.parse(fs.readFileSync(progressPath, 'utf8'))
@@ -75,6 +76,28 @@ if (result === 'pass') {
 }
 
 fs.writeFileSync(runtimeStatsPath, JSON.stringify(stats, null, 2) + '\n')
+
+function updateLastStepLogGate(gatePass) {
+  try {
+    if (!fs.existsSync(stepLogPath)) return
+    const raw = fs.readFileSync(stepLogPath, 'utf8')
+    const lines = raw.split('\n').filter((l) => l.trim() !== '')
+    if (lines.length === 0) return
+    let obj
+    try {
+      obj = JSON.parse(lines[lines.length - 1])
+    } catch {
+      return
+    }
+    obj.gate_pass = gatePass
+    lines[lines.length - 1] = JSON.stringify(obj)
+    fs.writeFileSync(stepLogPath, lines.join('\n') + '\n')
+  } catch {
+    // best-effort
+  }
+}
+
+updateLastStepLogGate(result === 'pass')
 
 const progressMd = [
   '# Progress',
