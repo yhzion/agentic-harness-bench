@@ -2,6 +2,11 @@ import fs from 'node:fs'
 import path from 'node:path'
 import crypto from 'node:crypto'
 import { snapshotStep } from './snapshot-step.mjs'
+import {
+  currentStepName,
+  editableFilesForCurrentStep,
+  isPathAllowed,
+} from './step-metadata.mjs'
 
 const root = process.cwd()
 const stateDir = path.join(root, '.agentic', 'state')
@@ -125,6 +130,37 @@ if ((missingFiles.length > 0 || mismatches.length > 0) && refreshAll) {
     `[snapshot-verify] PASS (after --refresh-all-mismatched) — refreshed ${affected.size} step lock(s)`,
   )
   process.exit(0)
+}
+
+// Auto-refresh: if every mismatched file is in the current STEP's
+// "수정 가능 파일" allowlist, treat the drift as a legitimate cross-step
+// edit and refresh the affected prior-step locks. Missing files are
+// never auto-handled — only modifications.
+if (mismatches.length > 0 && missingFiles.length === 0) {
+  const currentAllowed = editableFilesForCurrentStep(root)
+  if (currentAllowed.length > 0) {
+    const unauthorized = mismatches.filter((m) => !isPathAllowed(m.file, currentAllowed))
+    if (unauthorized.length === 0) {
+      const affected = new Set(mismatches.map((m) => m.lockedBy))
+      const currentStep = currentStepName(root) || '(unknown)'
+      for (const stepName of affected) {
+        try {
+          const { lockPath, fileCount } = snapshotStep(stepName)
+          const authorized = mismatches.filter((m) => m.lockedBy === stepName).length
+          console.log(
+            `[snapshot-verify] auto-refreshed ${stepName} → ${path.relative(root, lockPath)} (${fileCount} files; ${authorized} edit(s) authorized by ${currentStep} allowlist)`,
+          )
+        } catch (err) {
+          console.error(`[snapshot-verify] FAILED — could not auto-refresh ${stepName}: ${err.message}`)
+          process.exit(1)
+        }
+      }
+      console.log(
+        `[snapshot-verify] PASS (auto-refreshed ${affected.size} step lock(s) — drift confined to ${currentStep} allowlist)`,
+      )
+      process.exit(0)
+    }
+  }
 }
 
 if (missingFiles.length > 0 || mismatches.length > 0) {
