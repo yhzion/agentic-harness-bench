@@ -22,10 +22,16 @@ package.json의 scripts 섹션에 zero-warning 게이트 + 번들 사이즈 게�
 1. package.json을 읽는다.
 2. 위 8개 항목을 scripts 객체에 추가한다(기존 스크립트는 그대로 둔다).
 3. 키 순서는 자유. 다른 필드(dependencies, devDependencies 등)는 절대 변경하지 않는다.
-4. `package.json`은 STEP 001이 잠궈둔 파일이다. 본 STEP에서 정당하게 수정하므로, 작업 후 STEP 001의 snapshot lock을 갱신해야 한다:
+4. 본 STEP에서 게이트 1단 `format:check`가 처음 활성화된다. 이전 STEP들이 남긴 prettier 비준수 파일(예: trailing newline 누락)이 있으면 본 STEP이 일괄 정리한다:
 
    ```bash
-   node .agentic/scripts/verify-step-snapshots.mjs --refresh 001-scaffold-config
+   npm run format:write
+   ```
+
+5. `package.json`은 STEP 001이, `src/*` 등은 STEP 002가 잠궈둔 파일이다. 본 STEP에서 정당한 사유로 수정(scripts 추가 + format:write의 idempotent 포맷 변환)했으므로, 영향받은 lock을 일괄 갱신한다:
+
+   ```bash
+   node .agentic/scripts/verify-step-snapshots.mjs --refresh-all-mismatched
    ```
 
    이 명령을 누락하면 게이트 0단(snapshot-verify)에서 즉시 fail한다.
