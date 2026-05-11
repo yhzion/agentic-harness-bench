@@ -22,6 +22,13 @@ package.json의 scripts 섹션에 zero-warning 게이트 + 번들 사이즈 게�
 1. package.json을 읽는다.
 2. 위 8개 항목을 scripts 객체에 추가한다(기존 스크립트는 그대로 둔다).
 3. 키 순서는 자유. 다른 필드(dependencies, devDependencies 등)는 절대 변경하지 않는다.
+4. `package.json`은 STEP 001이 잠궈둔 파일이다. 본 STEP에서 정당하게 수정하므로, 작업 후 STEP 001의 snapshot lock을 갱신해야 한다:
+
+   ```bash
+   node .agentic/scripts/verify-step-snapshots.mjs --refresh 001-scaffold-config
+   ```
+
+   이 명령을 누락하면 게이트 0단(snapshot-verify)에서 즉시 fail한다.
 
 ## 수정 가능 파일 (정확히 1개)
 - package.json
