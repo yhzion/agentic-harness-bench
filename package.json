@@ -20,7 +20,8 @@
     "agent:benchmark": "node .agentic/scripts/score-run.mjs && node .agentic/scripts/leaderboard.mjs",
     "agent:run:pi": "bash .agentic/bin/run-pi-step-loop.sh",
     "agent:run:pi:smoke": "GATE_MODE=smoke bash .agentic/bin/run-pi-step-loop.sh",
-    "agent:run:pi:full": "GATE_MODE=full bash .agentic/bin/run-pi-step-loop.sh"
+    "agent:run:pi:full": "GATE_MODE=full bash .agentic/bin/run-pi-step-loop.sh",
+    "preview": "node .agentic/scripts/preview-harness.mjs"
   },
   "engines": {
     "node": ">=18"

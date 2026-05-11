@@ -1,6 +1,5 @@
-import { spawn } from 'node:child_process'
-import net from 'node:net'
 import { emit as emitRecoveryHint } from './emit-recovery-hint.mjs'
+import { startPreview } from './preview-harness.mjs'
 
 const PORT = Number(process.env.SMOKE_PORT || 4174)
 const HOST = '127.0.0.1'
@@ -11,34 +10,19 @@ let preview
 let browser
 let exitCode = 1
 
-process.on('SIGINT', cleanup)
-process.on('SIGTERM', cleanup)
+process.on('SIGINT', handleSignal)
+process.on('SIGTERM', handleSignal)
 
 try {
-  if (await isPortOpen(HOST, PORT)) {
-    console.error(
-      `[real-smoke] FAIL — port ${PORT} is already in use before preview boot.`,
-    )
-    console.error(
-      `이전 gate 실행의 vite preview가 orphan으로 남아있을 가능성이 큽니다 (PPID=1, --strictPort라 새 preview가 못 뜸).`,
-    )
-    console.error(
-      `해결: \`lsof -i :${PORT} -sTCP:LISTEN -n -P\` 로 점유자 확인 후 kill, 또는 SMOKE_PORT 환경변수로 다른 포트 지정.`,
-    )
-    throw new Error(`port ${PORT} occupied`)
-  }
-
   console.log(`[real-smoke] booting vite preview on ${HOST}:${PORT}...`)
-  preview = spawn('npx', ['vite', 'preview', '--port', String(PORT), '--strictPort'], {
-    stdio: ['ignore', 'pipe', 'pipe'],
-    shell: process.platform === 'win32',
+  preview = await startPreview({
+    port: PORT,
+    host: HOST,
+    bootTimeoutMs: BOOT_TIMEOUT_MS,
+    onStdout: (d) => process.stdout.write(`  [preview] ${d}`),
+    onStderr: (d) => process.stderr.write(`  [preview] ${d}`),
   })
-
-  preview.stdout.on('data', (d) => process.stdout.write(`  [preview] ${d}`))
-  preview.stderr.on('data', (d) => process.stderr.write(`  [preview] ${d}`))
-
-  await waitForPort(HOST, PORT, BOOT_TIMEOUT_MS)
-  console.log(`[real-smoke] preview ready`)
+  console.log(`[real-smoke] preview ready (pid ${preview.pid})`)
 
   let chromium
   try {
@@ -150,29 +134,12 @@ async function cleanup() {
     } catch {}
     browser = null
   }
-  if (preview && !preview.killed) {
-    preview.kill('SIGTERM')
-    await new Promise((r) => setTimeout(r, 200))
-    if (!preview.killed) preview.kill('SIGKILL')
+  if (preview) {
+    await preview.stop()
+    preview = null
   }
 }
 
-async function waitForPort(host, port, timeoutMs) {
-  const start = Date.now()
-  while (Date.now() - start < timeoutMs) {
-    if (await isPortOpen(host, port)) return
-    await new Promise((r) => setTimeout(r, 250))
-  }
-  throw new Error(`preview server did not start on ${host}:${port} within ${timeoutMs}ms`)
-}
-
-function isPortOpen(host, port) {
-  return new Promise((resolve) => {
-    const sock = net.createConnection({ host, port })
-    sock.on('connect', () => {
-      sock.end()
-      resolve(true)
-    })
-    sock.on('error', () => resolve(false))
-  })
+function handleSignal() {
+  cleanup().finally(() => process.exit(130))
 }
